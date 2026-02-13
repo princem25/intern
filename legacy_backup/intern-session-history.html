@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session History - InternAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</head>
+
+<body>
+
+    <div class="flex min-h-screen bg-body">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header"
+                style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; border-bottom: 1px solid var(--border);">
+                <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-layer-group text-primary"
+                        style="font-size: 1.5rem; margin-right: 0.75rem;"></i>
+                    <span style="font-size: 1.25rem; font-weight: 700;">InternAI</span>
+                </div>
+                <button id="sidebar-collapse-btn"
+                    style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu" style="padding: 1.5rem 1rem; flex: 1;">
+                <a href="intern-dashboard.html" class="menu-item">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="intern-workspace.html" class="menu-item">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="intern-performance.html" class="menu-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Performance</span>
+                </a>
+                <a href="intern-session-history.html" class="menu-item active">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Session History</span>
+                </a>
+                <a href="intern-profile.html" class="menu-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </nav>
+
+            <div style="padding: 1rem; border-top: 1px solid var(--border);">
+                <a href="login.html" class="menu-item" style="color: var(--danger);">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-content"
+            style="flex: 1; margin-left: 240px; display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-expand-btn" class="btn btn-secondary" style="padding: 0.5rem; display: none;">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 style="font-size: 1.25rem; margin: 0;">Session History</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="btn btn-secondary"
+                        style="border: none; background: transparent; font-size: 1.25rem; color: var(--text-muted);">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <div class="flex items-center gap-2 cursor-pointer">
+                        <div
+                            style="width: 32px; height: 32px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                            JD</div>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-8">
+                <div class="card p-6">
+                    <h3 class="mb-6">Recent Login Activity</h3>
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Device</th>
+                                <th>Location</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Oct 25, 2026 10:30 AM</td>
+                                <td><i class="fa-solid fa-desktop text-muted" style="margin-right: 0.5rem;"></i> Chrome
+                                    on Windows</td>
+                                <td>New York, USA</td>
+                                <td>Active now</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Oct 24, 2026 09:15 AM</td>
+                                <td><i class="fa-solid fa-laptop text-muted" style="margin-right: 0.5rem;"></i> Safari
+                                    on macOS</td>
+                                <td>New York, USA</td>
+                                <td>4h 20m</td>
+                                <td><span class="badge badge-secondary">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Oct 23, 2026 02:45 PM</td>
+                                <td><i class="fa-solid fa-mobile-screen text-muted" style="margin-right: 0.5rem;"></i>
+                                    Chrome on Android</td>
+                                <td>New York, USA</td>
+                                <td>15m</td>
+                                <td><span class="badge badge-secondary">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>Oct 22, 2026 11:00 AM</td>
+                                <td><i class="fa-solid fa-desktop text-muted" style="margin-right: 0.5rem;"></i> Firefox
+                                    on Windows</td>
+                                <td>New York, USA</td>
+                                <td>2h 10m</td>
+                                <td><span class="badge badge-secondary">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

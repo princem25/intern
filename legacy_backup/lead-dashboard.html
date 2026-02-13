@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Lead Dashboard - InternAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+    <style>
+        /* Reusing Dashboard Layout from Intern Dashboard (styles.css handles reusable parts, 
+           but sidebar structure is specific to page for this static demo) */
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+            background: var(--bg-body);
+        }
+
+        /* Specific Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 1rem;
+            background: var(--bg-body);
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar-sm {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-body);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .bg-success {
+            background-color: var(--success);
+        }
+
+        .bg-warning {
+            background-color: var(--warning);
+        }
+
+        .bg-danger {
+            background-color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header"
+                style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-layer-group text-primary" style="font-size: 1.5rem;"></i>
+                <span style="font-size: 1.25rem; font-weight: 700;">InternAI</span>
+            </div>
+
+            <nav style="padding: 1.5rem 1rem; flex: 1;">
+                <div
+                    style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; margin-left: 0.5rem;">
+                    Management</div>
+
+                <a href="lead-dashboard.html" class="menu-item active"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); color: var(--primary); background: rgba(79, 70, 229, 0.05); font-weight: 600; margin-bottom: 0.25rem;">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Interns</span>
+                </a>
+                <a href="lead-topics.html" class="menu-item"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); color: var(--text-muted); font-weight: 500; margin-bottom: 0.25rem; transition: var(--transition);">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Topics & Tasks</span>
+                </a>
+                <a href="lead-review.html" class="menu-item"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); color: var(--text-muted); font-weight: 500; margin-bottom: 0.25rem; transition: var(--transition);">
+                    <i class="fa-solid fa-code-compare"></i>
+                    <span>Code Reviews</span>
+                    <span class="badge badge-warning" style="margin-left: auto;">4</span>
+                </a>
+            </nav>
+
+            <div
+                style="padding: 1rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem;">
+                <div
+                    style="width: 40px; height: 40px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                    TL</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 0.875rem;">Sarah Connor</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Team Lead</div>
+                </div>
+                <a href="login.html" style="color: var(--text-muted);"><i
+                        class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="flex justify-between items-center" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="margin: 0;">Intern Management</h2>
+                    <p class="text-muted">Track progress and assign tasks to your team.</p>
+                </div>
+                <button class="btn btn-primary"><i class="fa-solid fa-plus" style="margin-right: 0.5rem;"></i> Assign
+                    New Task</button>
+            </header>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-4 gap-4" style="margin-bottom: 2rem;">
+                <div class="card p-4">
+                    <div class="text-muted" style="font-size: 0.875rem;">Total Interns</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">12</div>
+                </div>
+                <div class="card p-4">
+                    <div class="text-muted" style="font-size: 0.875rem;">Pending Reviews</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">4</div>
+                </div>
+                <div class="card p-4">
+                    <div class="text-muted" style="font-size: 0.875rem;">Avg. Score</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">88%</div>
+                </div>
+                <div class="card p-4">
+                    <div class="text-muted" style="font-size: 0.875rem;">On Track</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;">10/12</div>
+                </div>
+            </div>
+
+            <!-- Intern List Table -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="p-4 border-b flex justify-between items-center"
+                    style="border-bottom: 1px solid var(--border);">
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Search interns..." class="input-field"
+                            style="width: 250px; padding: 0.5rem;">
+                        <select class="input-field" style="width: 150px; padding: 0.5rem;">
+                            <option>All Status</option>
+                            <option>Active</option>
+                            <option>At Risk</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Intern</th>
+                            <th>Current Topic</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Last Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-sm">JD</div>
+                                    <div>
+                                        <div style="font-weight: 600;">John Doe</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">john@example.com
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Advanced React Patterns</td>
+                            <td style="width: 200px;">
+                                <div class="flex items-center gap-2">
+                                    <div style="flex: 1; height: 6px; background: var(--bg-body); border-radius: 4px;">
+                                        <div
+                                            style="width: 75%; height: 100%; background: var(--primary); border-radius: 4px;">
+                                        </div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">75%</span>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td class="text-muted">2 mins ago</td>
+                            <td>
+                                <button class="btn btn-secondary"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-sm">AS</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Alice Smith</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">alice@example.com
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Node.js Basics</td>
+                            <td style="width: 200px;">
+                                <div class="flex items-center gap-2">
+                                    <div style="flex: 1; height: 6px; background: var(--bg-body); border-radius: 4px;">
+                                        <div
+                                            style="width: 30%; height: 100%; background: var(--warning); border-radius: 4px;">
+                                        </div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">30%</span>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-warning">At Risk</span></td>
+                            <td class="text-muted">2 days ago</td>
+                            <td>
+                                <button class="btn btn-secondary"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-sm">RJ</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Robert Johnson</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">rob@example.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Database Design</td>
+                            <td style="width: 200px;">
+                                <div class="flex items-center gap-2">
+                                    <div style="flex: 1; height: 6px; background: var(--bg-body); border-radius: 4px;">
+                                        <div
+                                            style="width: 90%; height: 100%; background: var(--success); border-radius: 4px;">
+                                        </div>
+                                    </div>
+                                    <span style="font-size: 0.75rem;">90%</span>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-success">Completed</span></td>
+                            <td class="text-muted">5 hours ago</td>
+                            <td>
+                                <button class="btn btn-secondary"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

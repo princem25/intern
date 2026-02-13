@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AI Internship System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--bg-body);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+
+        /* Role Selection Cards */
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .role-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+        }
+
+        .role-card:hover {
+            border-color: var(--text-muted);
+        }
+
+        .role-card.active {
+            border-color: var(--primary);
+            background-color: rgba(79, 70, 229, 0.05);
+            /* Slight tint */
+        }
+
+        [data-theme="dark"] .role-card.active {
+            background-color: rgba(79, 70, 229, 0.15);
+        }
+
+        .role-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .role-card.active .role-icon {
+            color: var(--primary);
+        }
+
+        .role-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <a href="index.html" class="logo"
+                    style="font-size: 2rem; margin-bottom: 0.5rem; display: block;">InternAI</a>
+                <p class="text-muted">Create your account</p>
+            </div>
+
+            <!-- Role Selection -->
+            <label class="input-label" style="margin-bottom: 0.75rem;">Select your role</label>
+            <div class="role-grid">
+                <div class="role-card active" onclick="selectRole(this, 'intern')">
+                    <div class="role-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="role-title">Intern</div>
+                </div>
+                <div class="role-card" onclick="selectRole(this, 'lead')">
+                    <div class="role-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div class="role-title">Team Lead</div>
+                </div>
+            </div>
+
+            <form action="login.html">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label class="input-label">First Name</label>
+                        <input type="text" class="input-field" placeholder="John" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Last Name</label>
+                        <input type="text" class="input-field" placeholder="Doe" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Email Address</label>
+                    <input type="email" class="input-field" placeholder="john@example.com" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <input type="password" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Confirm Password</label>
+                        <input type="password" class="input-field" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <!-- Dynamic Fields -->
+                <div id="dynamic-fields">
+                    <!-- Intern Fields by default -->
+                    <div class="input-group">
+                        <label class="input-label">Tech Stack / Skills</label>
+                        <input type="text" class="input-field" placeholder="e.g. React, Node.js, Python">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full"
+                    style="margin-top: 0.5rem; padding: 0.875rem;">Create Account</button>
+            </form>
+
+            <div class="text-center" style="margin-top: 1.5rem; font-size: 0.875rem;">
+                <span class="text-muted">Already have an account? </span>
+                <a href="login.html" class="text-primary font-medium hover:underline">Sign in</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function selectRole(element, role) {
+            // UI Toggle
+            document.querySelectorAll('.role-card').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Dynamic Content
+            const container = document.getElementById('dynamic-fields');
+
+            if (role === 'intern') {
+                container.innerHTML = `
+                    <div class="input-group">
+                        <label class="input-label">Tech Stack / Skills</label>
+                        <input type="text" class="input-field" placeholder="e.g. React, Node.js, Python">
+                    </div>
+                `;
+            } else if (role === 'lead') {
+                container.innerHTML = `
+                    <div class="input-group">
+                        <label class="input-label">Department</label>
+                        <select class="input-field">
+                            <option>Frontend Development</option>
+                            <option>Backend Development</option>
+                            <option>Full Stack</option>
+                            <option>Data Science</option>
+                            <option>UI/UX Design</option>
+                        </select>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

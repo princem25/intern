@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern Dashboard - InternAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</head>
+
+<body>
+
+    <div class="flex min-h-screen bg-body">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header"
+                style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; border-bottom: 1px solid var(--border);">
+                <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-layer-group text-primary"
+                        style="font-size: 1.5rem; margin-right: 0.75rem;"></i>
+                    <span style="font-size: 1.25rem; font-weight: 700;">InternAI</span>
+                </div>
+                <button id="sidebar-collapse-btn"
+                    style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu" style="padding: 1.5rem 1rem; flex: 1;">
+                <a href="#" class="menu-item active">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="intern-workspace.html" class="menu-item">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="intern-performance.html" class="menu-item">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Performance</span>
+                </a>
+                <a href="intern-session-history.html" class="menu-item">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Session History</span>
+                </a>
+                <a href="intern-profile.html" class="menu-item">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </nav>
+
+            <div style="padding: 1rem; border-top: 1px solid var(--border);">
+                <a href="index.html" class="menu-item" style="color: var(--danger);">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-content"
+            style="flex: 1; margin-left: 240px; display: flex; flex-direction: column; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-expand-btn" class="btn btn-secondary" style="padding: 0.5rem; display: none;">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 style="font-size: 1.25rem; margin: 0;">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="btn btn-secondary"
+                        style="border: none; background: transparent; font-size: 1.25rem; color: var(--text-muted);">
+                        <i class="fa-regular fa-bell"></i>
+                    </button>
+                    <div class="flex items-center gap-2 cursor-pointer">
+                        <div
+                            style="width: 32px; height: 32px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                            JD</div>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Main Content -->
+            <main class="p-8">
+
+                <!-- Row 1: Stats Cards -->
+                <!-- Standard 4-column grid layout that stretches to fill available space -->
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <!-- Card 1 -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
+                            <i class="fa-solid fa-book"></i>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">React Hooks</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Assigned Topic</div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fa-solid fa-bars-progress"></i>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">75%</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Progress</div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">850</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Current Score</div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--accent);">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">4h 20m</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">Time Spent</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Current Task Panel -->
+                <div class="task-panel mb-8">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 style="margin: 0;">Build a To-Do App</h3>
+                            <span class="badge badge-warning">In Progress</span>
+                        </div>
+                        <div class="text-muted" style="margin-bottom: 1.5rem;">
+                            <i class="fa-solid fa-calendar" style="margin-right: 0.5rem;"></i> Deadline: Tomorrow, 5:00
+                            PM
+                        </div>
+                        <a href="intern-workspace.html" class="btn btn-primary"
+                            style="padding-left: 2rem; padding-right: 2rem;">
+                            Start Task <i class="fa-solid fa-arrow-right" style="margin-left: 0.5rem;"></i>
+                        </a>
+                    </div>
+                    <!-- Optional illustration or graphic could go here -->
+                    <div
+                        style="width: 120px; height: 120px; background: var(--bg-body); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--border);">
+                        <i class="fa-solid fa-code" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+
+                <!-- Row 3: Recent Feedback -->
+                <div>
+                    <h3 style="margin-bottom: 1rem;">Recent Feedback</h3>
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Score</th>
+                                <th>Feedback</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Array Manipulation</td>
+                                <td><span class="badge badge-success">90/100</span></td>
+                                <td>Good optimization, but variable naming could be better.</td>
+                                <td>Oct 24, 2026</td>
+                            </tr>
+                            <tr>
+                                <td>Flexbox Layout</td>
+                                <td><span class="badge badge-warning">75/100</span></td>
+                                <td>Missed responsiveness on mobile screens.</td>
+                                <td>Oct 23, 2026</td>
+                            </tr>
+                            <tr>
+                                <td>API Fetching</td>
+                                <td><span class="badge badge-success">95/100</span></td>
+                                <td>Excellent error handling implementation.</td>
+                                <td>Oct 21, 2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
