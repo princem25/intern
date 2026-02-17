@@ -34,7 +34,37 @@ const LeadDashboard = () => {
                     <div className="text-muted" style={{ fontSize: '0.875rem' }}>On Track</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>10/12</div>
                 </Card>
+                <Card className="p-4">
+                    <div className="text-muted" style={{ fontSize: '0.875rem' }}>On Track</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>10/12</div>
+                </Card>
             </div>
+
+            {/* Extra Hours Requests (New DB Feature) */}
+            <Card className="mb-8" style={{ padding: 0, overflow: 'hidden' }}>
+                <div className="p-4 border-b" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <h4 style={{ margin: 0, fontSize: '1rem' }}>Extra Hours Requests</h4>
+                </div>
+                <div className="p-4">
+                    <div className="flex items-center justify-between border-b pb-4 mb-4" style={{ borderColor: 'var(--border)' }}>
+                        <div className="flex items-center gap-3">
+                            <div className="avatar-sm" style={{ width: '32px', height: '32px', background: 'var(--bg-body)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>JD</div>
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>John Doe</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Reason: "Studied offline docs" • 120 mins</div>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>Reject</Button>
+                            <Button variant="primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>Approve</Button>
+                        </div>
+                    </div>
+                    {/* Placeholder for no requests */}
+                    <div className="text-center text-muted" style={{ fontSize: '0.875rem', padding: '1rem' }}>
+                        No more pending requests
+                    </div>
+                </div>
+            </Card>
 
             {/* Intern List Table */}
             <Card style={{ padding: 0, overflow: 'hidden' }}>
@@ -72,13 +102,9 @@ const LeadDashboard = () => {
                                 </div>
                             </td>
                             <td>Advanced React Patterns</td>
+                            <td>Advanced React Patterns</td>
                             <td style={{ width: '200px' }}>
-                                <div className="flex items-center gap-2">
-                                    <div style={{ flex: 1, height: '6px', background: 'var(--bg-body)', borderRadius: '4px' }}>
-                                        <div style={{ width: '75%', height: '100%', background: 'var(--primary)', borderRadius: '4px' }}></div>
-                                    </div>
-                                    <span style={{ fontSize: '0.75rem' }}>75%</span>
-                                </div>
+                                <span className="badge badge-primary">In Progress</span>
                             </td>
                             <td><span className="badge badge-success">Active</span></td>
                             <td className="text-muted">2 mins ago</td>
@@ -97,13 +123,9 @@ const LeadDashboard = () => {
                                 </div>
                             </td>
                             <td>Node.js Basics</td>
+                            <td>Node.js Basics</td>
                             <td style={{ width: '200px' }}>
-                                <div className="flex items-center gap-2">
-                                    <div style={{ flex: 1, height: '6px', background: 'var(--bg-body)', borderRadius: '4px' }}>
-                                        <div style={{ width: '30%', height: '100%', background: 'var(--warning)', borderRadius: '4px' }}></div>
-                                    </div>
-                                    <span style={{ fontSize: '0.75rem' }}>30%</span>
-                                </div>
+                                <span className="badge badge-warning">Assigned</span>
                             </td>
                             <td><span className="badge badge-warning">At Risk</span></td>
                             <td className="text-muted">2 days ago</td>
@@ -122,13 +144,9 @@ const LeadDashboard = () => {
                                 </div>
                             </td>
                             <td>Database Design</td>
+                            <td>Database Design</td>
                             <td style={{ width: '200px' }}>
-                                <div className="flex items-center gap-2">
-                                    <div style={{ flex: 1, height: '6px', background: 'var(--bg-body)', borderRadius: '4px' }}>
-                                        <div style={{ width: '90%', height: '100%', background: 'var(--success)', borderRadius: '4px' }}></div>
-                                    </div>
-                                    <span style={{ fontSize: '0.75rem' }}>90%</span>
-                                </div>
+                                <span className="badge badge-success">Completed</span>
                             </td>
                             <td><span className="badge badge-success">Completed</span></td>
                             <td className="text-muted">5 hours ago</td>

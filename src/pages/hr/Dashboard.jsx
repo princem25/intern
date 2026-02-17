@@ -35,17 +35,10 @@ const HRDashboard = () => {
                 </Card>
                 <Card className="p-4">
                     <div className="flex justify-between items-start mb-2">
-                        <div className="text-muted" style={{ fontSize: '0.875rem' }}>Placement Rate</div>
-                        <div className="text-muted" style={{ fontSize: '0.75rem' }}>Predicted</div>
-                    </div>
-                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)' }}>62%</div>
-                </Card>
-                <Card className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                        <div className="text-muted" style={{ fontSize: '0.875rem' }}>At Risk</div>
+                        <div className="text-muted" style={{ fontSize: '0.875rem' }}>Pending Users</div>
                         <span className="badge badge-warning">Action Needed</span>
                     </div>
-                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--danger)' }}>5</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--warning)' }}>5</div>
                 </Card>
             </div>
 
@@ -88,11 +81,17 @@ const HRDashboard = () => {
                                 <div className="avatar-sm" style={{ width: '32px', height: '32px', background: '#eee', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>MK</div>
                                 <div>
                                     <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Michael K.</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Applied: Frontend</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Technology: PHP</div>
                                 </div>
                             </div>
+                            <div className="mb-2">
+                                <select className="input-field" style={{ fontSize: '0.75rem', padding: '0.25rem' }}>
+                                    <option value="">Assign Team Lead...</option>
+                                    <option value="2">Team Lead 1 (PHP)</option>
+                                </select>
+                            </div>
                             <div className="flex gap-2">
-                                <Button variant="primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.75rem' }}>Approve</Button>
+                                <Button variant="primary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.75rem' }}>Approve & Assign</Button>
                                 <Button variant="secondary" style={{ width: '100%', padding: '0.25rem', fontSize: '0.75rem' }}>Reject</Button>
                             </div>
                         </div>

@@ -82,33 +82,16 @@ const LeadReview = () => {
                     </div>
 
                     <div className="panel-body" style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
-                        <div className="input-group">
-                            <label className="input-label">Code Quality</label>
-                            <select className="input-field">
-                                <option>Exceeds Expectations</option>
-                                <option defaultValue>Meets Expectations</option>
-                                <option>Needs Improvement</option>
-                            </select>
-                        </div>
+
 
                         <div className="input-group">
-                            <label className="input-label">Efficiency</label>
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="badge badge-success">O(n)</div>
-                                <span className="text-muted" style={{ fontSize: '0.75rem' }}>Time</span>
-                                <div className="badge badge-warning">O(n)</div>
-                                <span className="text-muted" style={{ fontSize: '0.75rem' }}>Space</span>
-                            </div>
-                        </div>
-
-                        <div className="input-group">
-                            <label className="input-label">Comments</label>
-                            <textarea className="input-field" rows="6" placeholder="Add specific feedback here..." defaultValue="Great use of Map for O(1) lookups. In the future, verify constraints before choosing the data structure, but this is optimal for general cases."></textarea>
+                            <label className="input-label">Feedback</label>
+                            <textarea className="input-field" rows="6" placeholder="Add specific feedback here..." defaultValue="Great use of Map for O(1) lookups. In the future, verify constraints before choosing the data structure, but this is optimal for general cases." name="teamlead_feedback"></textarea>
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">Score (0-100)</label>
-                            <input type="number" className="input-field" defaultValue="95" />
+                            <input type="number" className="input-field" defaultValue="95" name="teamlead_score" />
                         </div>
                     </div>
 

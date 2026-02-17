@@ -43,15 +43,9 @@ const Register = () => {
                 </div>
 
                 <form onSubmit={handleRegister}>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="input-group">
-                            <label className="input-label">First Name</label>
-                            <input type="text" className="input-field" placeholder="John" required />
-                        </div>
-                        <div className="input-group">
-                            <label className="input-label">Last Name</label>
-                            <input type="text" className="input-field" placeholder="Doe" required />
-                        </div>
+                    <div className="input-group">
+                        <label className="input-label">Full Name</label>
+                        <input type="text" className="input-field" placeholder="John Doe" name="name" required />
                     </div>
 
                     <div className="input-group">
@@ -72,25 +66,15 @@ const Register = () => {
 
                     {/* Dynamic Fields */}
                     <div id="dynamic-fields" className="mb-4">
-                        {role === 'intern' && (
-                            <div className="input-group">
-                                <label className="input-label">Tech Stack / Skills</label>
-                                <input type="text" className="input-field" placeholder="e.g. React, Node.js, Python" />
-                            </div>
-                        )}
-
-                        {role === 'lead' && (
-                            <div className="input-group">
-                                <label className="input-label">Department</label>
-                                <select className="input-field">
-                                    <option>Frontend Development</option>
-                                    <option>Backend Development</option>
-                                    <option>Full Stack</option>
-                                    <option>Data Science</option>
-                                    <option>UI/UX Design</option>
-                                </select>
-                            </div>
-                        )}
+                        <div className="input-group">
+                            <label className="input-label">Technology Track</label>
+                            <select className="input-field" name="technology_id">
+                                <option value="1">PHP</option>
+                                <option value="2">Laravel</option>
+                                <option value="3">Java</option>
+                                <option value="4">AI</option>
+                            </select>
+                        </div>
                     </div>
 
                     <button type="submit" className="btn btn-primary w-full" style={{ marginTop: '0.5rem', padding: '0.875rem' }}>Create Account</button>

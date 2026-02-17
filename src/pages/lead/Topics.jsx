@@ -26,6 +26,9 @@ const LeadTopics = () => {
                             <i className="fa-brands fa-react text-primary"></i>
                         </div>
                         <div className="flex gap-2">
+                            <button style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: '0.75rem', marginRight: '0.5rem' }}>
+                                <i className="fa-solid fa-list-check" style={{ marginRight: '0.25rem' }}></i> Questions
+                            </button>
                             <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}><i className="fa-solid fa-pen"></i></button>
                             <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}><i className="fa-solid fa-trash"></i></button>
                         </div>
@@ -130,9 +133,10 @@ const LeadTopics = () => {
                             <div className="input-group">
                                 <label className="input-label">Category</label>
                                 <select className="input-field">
-                                    <option>Frontend</option>
-                                    <option>Backend</option>
-                                    <option>DevOps</option>
+                                    <option value="1">PHP</option>
+                                    <option value="2">Laravel</option>
+                                    <option value="3">Java</option>
+                                    <option value="4">AI</option>
                                 </select>
                             </div>
                             <div className="input-group">

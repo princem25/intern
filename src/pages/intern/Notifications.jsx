@@ -29,37 +29,19 @@ const Notifications = () => {
         {
             id: 3,
             type: 'info',
-            title: 'New Task Assigned',
-            message: 'You have been assigned a new task: "Build Authentication System". Deadline: Feb 20, 2026',
+            title: 'New Topic Assigned',
+            message: 'You have been assigned a new topic: "PHP OOP Basics". Check your workspace.',
             time: '3 hours ago',
             timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
             unread: false
         },
         {
             id: 4,
-            type: 'danger',
-            title: 'Deadline Approaching',
-            message: 'Your task "To-Do App" is due tomorrow at 5:00 PM. Make sure to submit before the deadline.',
+            type: 'success',
+            title: 'Extra Hours Approved',
+            message: 'Your request for 120 minutes of extra time has been approved.',
             time: '5 hours ago',
             timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-            unread: false
-        },
-        {
-            id: 5,
-            type: 'success',
-            title: 'Task Completed',
-            message: 'You successfully completed "Database Schema Design". Points earned: +50',
-            time: '1 day ago',
-            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-            unread: false
-        },
-        {
-            id: 6,
-            type: 'info',
-            title: 'Weekly Report Available',
-            message: 'Your weekly performance report is now available. Check your progress and achievements.',
-            time: '2 days ago',
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
             unread: false
         }
     ];
@@ -97,30 +79,10 @@ const Notifications = () => {
             <div style={{ marginBottom: '2rem' }}>
                 <div className="flex justify-between items-center mb-6" style={{ flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
-                        <h1 style={{ margin: 0, marginBottom: '0.5rem' }}>Notifications</h1>
+                        <h1 style={{ margin: 0, marginBottom: '0.5rem' }}>Recent Activity</h1>
                         <p className="text-muted" style={{ margin: 0 }}>
-                            {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+                            Updates on your tasks and performance
                         </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant={filter === 'all' ? 'primary' : 'secondary'}
-                            onClick={() => setFilter('all')}
-                        >
-                            All
-                        </Button>
-                        <Button
-                            variant={filter === 'unread' ? 'primary' : 'secondary'}
-                            onClick={() => setFilter('unread')}
-                        >
-                            Unread ({unreadCount})
-                        </Button>
-                        <Button
-                            variant={filter === 'read' ? 'primary' : 'secondary'}
-                            onClick={() => setFilter('read')}
-                        >
-                            Read
-                        </Button>
                     </div>
                 </div>
 
@@ -135,8 +97,8 @@ const Notifications = () => {
                         filteredNotifications.map((notification) => (
                             <Card
                                 key={notification.id}
-                                className={`p-6 ${notification.unread ? 'notification-card-unread' : ''}`}
-                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                className="p-6"
+                                style={{ transition: 'all 0.2s' }}
                             >
                                 <div className="flex gap-4">
                                     <div
@@ -149,11 +111,6 @@ const Notifications = () => {
                                         <div className="flex justify-between items-start mb-2" style={{ gap: '1rem' }}>
                                             <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
                                                 {notification.title}
-                                                {notification.unread && (
-                                                    <span className="badge badge-primary" style={{ marginLeft: '0.75rem', fontSize: '0.7rem' }}>
-                                                        New
-                                                    </span>
-                                                )}
                                             </h3>
                                             <span className="text-muted" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                                                 {notification.time}

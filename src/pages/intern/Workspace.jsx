@@ -17,7 +17,7 @@ const InternWorkspace = () => {
                         <div className="question-item active">
                             <div className="flex justify-between items-center mb-1" style={{ marginBottom: '0.25rem' }}>
                                 <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>1. Two Sum</span>
-                                <span className="difficulty-badge diff-easy">Easy</span>
+                                <span className="difficulty-badge diff-easy">basic</span>
                             </div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Array • Hash Map</div>
                         </div>
@@ -25,7 +25,7 @@ const InternWorkspace = () => {
                         <div className="question-item">
                             <div className="flex justify-between items-center mb-1" style={{ marginBottom: '0.25rem' }}>
                                 <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>2. Reverse Linked List</span>
-                                <span className="difficulty-badge diff-medium">Med</span>
+                                <span className="difficulty-badge diff-medium">medium</span>
                             </div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Linked List • Recursion</div>
                         </div>
@@ -33,7 +33,7 @@ const InternWorkspace = () => {
                         <div className="question-item">
                             <div className="flex justify-between items-center mb-1" style={{ marginBottom: '0.25rem' }}>
                                 <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>3. LRU Cache</span>
-                                <span className="difficulty-badge diff-hard">Hard</span>
+                                <span className="difficulty-badge diff-hard">hard</span>
                             </div>
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Design • Hash Map</div>
                         </div>
@@ -44,8 +44,7 @@ const InternWorkspace = () => {
                 <div className="col-desc">
                     <h1 className="problem-title">Two Sum</h1>
                     <div className="problem-meta">
-                        <span className="difficulty-badge diff-easy">Easy</span>
-                        <span><i className="fa-regular fa-clock"></i> 15 mins</span>
+                        <span className="difficulty-badge diff-easy">basic</span>
                         <span><i className="fa-solid fa-trophy"></i> 100 Points</span>
                     </div>
 

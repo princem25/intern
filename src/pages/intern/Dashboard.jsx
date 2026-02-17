@@ -37,12 +37,13 @@ const InternDashboard = () => {
                 </Card>
 
                 {/* Card 4 */}
+                {/* Card 4 - Replaced Time Spent with Attendance if possible or remove. Leaving 3 cards for now or using Logic */}
                 <Card className="stat-card">
                     <div className="stat-icon" style={{ background: 'rgba(6, 182, 212, 0.1)', color: 'var(--accent)' }}>
-                        <i className="fa-solid fa-clock"></i>
+                        <i className="fa-solid fa-clock-rotate-left"></i>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.25rem' }}>4h 20m</div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Time Spent</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.25rem' }}>120m</div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Extra Hours Approved</div>
                 </Card>
             </div>
 
@@ -55,7 +56,7 @@ const InternDashboard = () => {
                             <span className="badge badge-warning">In Progress</span>
                         </div>
                         <div className="text-muted" style={{ marginBottom: '1.5rem' }}>
-                            <i className="fa-solid fa-calendar" style={{ marginRight: '0.5rem' }}></i> Deadline: Tomorrow, 5:00 PM
+                            <i className="fa-solid fa-calendar" style={{ marginRight: '0.5rem' }}></i> Assigned: Yesterday
                         </div>
                         <Link to="/intern/workspace" style={{ textDecoration: 'none' }}>
                             <Button variant="primary" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>

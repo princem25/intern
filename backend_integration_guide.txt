@@ -1,0 +1,160 @@
+# Backend Integration Guide - Frontend to Database Mapping
+# Generated on 2026-02-17
+# This guide connects frontend components (Pages, Inputs, Data) to the specific Database Schema provided.
+
+==================================================
+PAGE: Login
+FILE: src/pages/auth/Login.jsx
+ROUTE: /auth/login
+--------------------------------------------------
+DATABASE TABLE: `users`, `session_logs`
+
+FORM INPUTS:
+- Email Address -> `users.email`
+- Password -> `users.password` (Compare with hashed value)
+
+LOGIC:
+- On success, create record in `session_logs`:
+  - `user_id`: users.id
+  - `login_at`: NOW()
+
+==================================================
+PAGE: Register
+FILE: src/pages/auth/Register.jsx
+ROUTE: /auth/register
+--------------------------------------------------
+DATABASE TABLE: `users`, `roles`
+
+FORM INPUTS:
+- First Name + Last Name -> `users.name` (Concatenate strings before insert)
+- Email Address -> `users.email`
+- Password -> `users.password` (Must hold hashed value)
+- Role Selection -> `users.role_id` 
+  - IF 'intern' -> SELECT id FROM roles WHERE name='intern'
+  - IF 'lead' -> SELECT id FROM roles WHERE name='teamlead'
+- Tech Stack -> `users.technology_id` (Link to `technologies` table)
+
+==================================================
+PAGE: Start (Intern Dashboard)
+FILE: src/pages/intern/Dashboard.jsx
+ROUTE: /intern/dashboard
+--------------------------------------------------
+DATABASE TABLES: `topic_assignments`, `performance`, `session_logs`
+
+DATA MAPPING:
+- "React Hooks" (Topic) -> `topics.title` (via `topic_assignments`)
+- Progress (75%) -> Calculate from `topic_assignments` status or `performance` score
+- Current Score -> SUM(`performance.final_score`) for user
+- Time Spent -> SUM(`session_logs.active_minutes`) + SUM(`extra_hours.approved_minutes`)
+
+==================================================
+PAGE: Intern Workspace
+FILE: src/pages/intern/Workspace.jsx
+ROUTE: /intern/workspace
+--------------------------------------------------
+DATABASE TABLES: `topics`, `questions`, `topic_assignments`, `submissions`
+
+DATA MAPPING:
+- Task List -> SELECT * FROM `questions` WHERE topic_id = (Current Topic ID)
+- Difficulty -> `questions.difficulty` (ENUM: 'basic','medium','hard')
+- BADGES:
+  - Points -> `questions.marks`
+  - Difficulty -> `questions.difficulty`
+
+FORM/ACTION:
+- Submit Solution -> INSERT/UPDATE `submissions`
+  - `topic_assignment_id`: Link to current assignment
+  - `question_id`: Current question
+  - `code_answer`: Content from Code Editor
+  - `status`: 'submitted'
+
+==================================================
+PAGE: Intern Performance
+FILE: src/pages/intern/Performance.jsx
+ROUTE: /intern/performance
+--------------------------------------------------
+DATABASE TABLES: `performance`, `technologies`
+
+DATA MAPPING:
+- Skill Breakdown -> Aggregate scores grouped by `technologies.name`
+- Scores -> `performance.final_score`
+- Activity Graph -> derived from `session_logs` or `submissions.created_at`
+
+==================================================
+PAGE: Intern Profile
+FILE: src/pages/intern/Profile.jsx
+ROUTE: /intern/profile
+--------------------------------------------------
+DATABASE TABLE: `users`
+
+FORM INPUTS (Edit Profile):
+- Name -> `users.name`
+- Email -> `users.email`
+- Phone -> [Note: Column `phone` does NOT exist in schema. Use `users` table extension or JSON field if needed]
+
+==================================================
+PAGE: Intern Leaderboard
+FILE: src/pages/intern/Leaderboard.jsx
+ROUTE: /intern/leaderboard
+--------------------------------------------------
+DATABASE TABLES: `performance`, `users`, `topic_assignments`
+
+LOGIC:
+- Rank -> DESC ordering of Sum of `performance.final_score`
+- Points -> Sum of `performance.final_score`
+- Tasks Completed -> COUNT(`topic_assignments`) WHERE status='completed'
+
+==================================================
+PAGE: Team Lead Dashboard
+FILE: src/pages/lead/Dashboard.jsx
+ROUTE: /lead/dashboard
+--------------------------------------------------
+DATABASE TABLES: `users` (Role=Intern), `team_assignments`, `submissions`
+
+DATA MAPPING:
+- Total Interns -> COUNT(`team_assignments`) WHERE team_lead_id = Current User
+- Pending Reviews -> COUNT(`submissions`) WHERE status='submitted' AND team_lead_id (via topic relation) = Current User
+- Avg Score -> AVG(`performance.final_score`) of assigned interns
+
+==================================================
+PAGE: Lead Intern Management
+FILE: src/pages/lead/InternManagement.jsx
+ROUTE: /lead/interns
+--------------------------------------------------
+DATABASE TABLES: `users`, `team_assignments`, `session_logs`
+
+DATA MAPPING:
+- List of Interns -> `team_assignments` JOIN `users`
+- Status -> `users.status` ('pending','approved','rejected') OR `session_logs.is_active` for online status
+- Skills -> `users.technology_id` -> `technologies.name`
+- Last Active -> MAX(`session_logs.logout_at`)
+
+==================================================
+PAGE: Lead Topics
+FILE: src/pages/lead/Topics.jsx
+ROUTE: /lead/topics
+--------------------------------------------------
+DATABASE TABLES: `topics`
+
+FORM INPUTS (Create Topic):
+- Title -> `topics.title`
+- Description -> `topics.description`
+- Category/Tech -> `topics.technology_id`
+- Status -> `topics.status` ('draft', 'published', etc.)
+- Team Lead -> `topics.team_lead_id` (Current User)
+
+==================================================
+PAGE: Lead Review
+FILE: src/pages/lead/Review.jsx
+ROUTE: /lead/review
+--------------------------------------------------
+DATABASE TABLES: `submissions`, `performance`
+
+DATA MAPPING:
+- Code Content -> `submissions.code_answer`
+- Intern Name -> `users.name` (via `submissions` -> `topic_assignments` -> `intern_id`)
+
+FORM INPUTS (Evaluation):
+- Feedback -> `submissions.teamlead_feedback`
+- Score -> `submissions.teamlead_score` (and subsequently update `performance` table)
+- Action (Approve/Reject) -> Update `submissions.status` to 'reviewed'

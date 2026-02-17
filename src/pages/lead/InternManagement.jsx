@@ -273,9 +273,9 @@ const InternManagement = () => {
                                 </div>
                                 <div className="text-center">
                                     <div className="text-lg font-bold text-orange-500">
-                                        {intern.streak}
+                                        {intern.lastActive}
                                     </div>
-                                    <div className="text-xs text-muted">Streak</div>
+                                    <div className="text-xs text-muted">Last Active</div>
                                 </div>
                             </div>
 
