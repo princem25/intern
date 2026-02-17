@@ -2,12 +2,15 @@
 :root {
   /* Colors - Light Mode */
   --primary: #4F46E5;
+  --primary-rgb: 79, 70, 229;
   /* Indigo 600 - Brand */
   --primary-hover: #6366F1;
   /* Indigo 500 */
   --secondary: #7C3AED;
+  --secondary-rgb: 124, 58, 237;
   /* Purple Accent - AI Feel */
   --accent: #7C3AED;
+  --accent-rgb: 124, 58, 237;
   /* Purple Accent */
 
   --bg-body: #F8FAFC;
@@ -22,8 +25,11 @@
   /* Slate 200 */
 
   --success: #10B981;
+  --success-rgb: 16, 185, 129;
   --warning: #F59E0B;
+  --warning-rgb: 245, 158, 11;
   --danger: #EF4444;
+  --danger-rgb: 239, 68, 68;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
@@ -1161,6 +1167,90 @@ small,
   animation: slideDown 0.3s ease;
 }
 
+
+/* Intern Card Content Overflow Fixes */
+.intern-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.intern-email {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.intern-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+  /* Prevent shrinking */
+}
+
+.skill-badge {
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.activity-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-task {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
 
 
 .menu-item {

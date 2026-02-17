@@ -213,7 +213,8 @@ const InternManagement = () => {
                             className="intern-card-modern"
                             style={{
                                 padding: '1.5rem',
-                                borderTop: intern.needsAttention ? '4px solid var(--danger)' : '4px solid transparent',
+                                border: intern.performance > stats.avgPerformance ? '2px solid var(--success)' : undefined,
+                                borderTop: intern.needsAttention ? '4px solid var(--danger)' : (intern.performance > stats.avgPerformance ? '2px solid var(--success)' : '4px solid transparent'),
                                 cursor: 'pointer',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 display: 'flex',
@@ -229,9 +230,9 @@ const InternManagement = () => {
                                     <div className="intern-avatar">
                                         {intern.avatar}
                                     </div>
-                                    <div>
-                                        <h3 className="intern-name">{intern.name}</h3>
-                                        <p className="intern-email">{intern.email}</p>
+                                    <div style={{ minWidth: 0, flex: 1 }}>
+                                        <h3 className="intern-name" title={intern.name}>{intern.name}</h3>
+                                        <p className="intern-email" title={intern.email}>{intern.email}</p>
                                     </div>
                                 </div>
                                 {intern.needsAttention && (
