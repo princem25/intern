@@ -1,107 +1,260 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { getPendingUsers, updateUserStatus } from '../../api/admin';
+import { getHRStats, getUsers } from '../../api/admin';
 
 const HRDashboard = () => {
-    const [pendingUsers, setPendingUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+    const [recentPending, setRecentPending] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadPendingUsers();
+        loadData();
     }, []);
 
-    const loadPendingUsers = async () => {
+    const loadData = async () => {
         setLoading(true);
         try {
-            const users = await getPendingUsers();
-            setPendingUsers(users);
-        } catch (error) {
-            console.error("Failed to load pending users", error);
+            const [statsData, pendingData] = await Promise.all([
+                getHRStats(),
+                getUsers({ status: 'pending' }),
+            ]);
+            setStats(statsData);
+            setRecentPending(pendingData.slice(0, 5));
+        } catch (err) {
+            console.error('Failed to load HR dashboard data', err);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleApprove = async (id) => {
-        try {
-            await updateUserStatus(id, 'approved');
-            setPendingUsers(prev => prev.filter(u => u.id !== id));
-            alert("User approved successfully");
-        } catch (error) {
-            alert("Failed to approve user");
-        }
+    const kpiCards = [
+        {
+            label: 'Total Registrations',
+            value: stats.total,
+            icon: 'fa-users',
+            color: 'var(--primary)',
+            bg: 'rgba(79,70,229,0.1)',
+        },
+        {
+            label: 'Pending Approvals',
+            value: stats.pending,
+            icon: 'fa-user-clock',
+            color: 'var(--warning)',
+            bg: 'rgba(245,158,11,0.1)',
+            badge: stats.pending > 0 ? 'Action Needed' : null,
+            badgeColor: 'warning',
+        },
+        {
+            label: 'Approved Members',
+            value: stats.approved,
+            icon: 'fa-user-check',
+            color: 'var(--success)',
+            bg: 'rgba(16,185,129,0.1)',
+        },
+        {
+            label: 'Rejected',
+            value: stats.rejected,
+            icon: 'fa-user-xmark',
+            color: 'var(--danger)',
+            bg: 'rgba(239,68,68,0.1)',
+        },
+    ];
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '—';
+        return new Date(dateStr).toLocaleDateString('en-IN', {
+            day: '2-digit', month: 'short', year: 'numeric',
+        });
     };
 
-    const handleReject = async (id) => {
-        if (!window.confirm("Are you sure you want to reject this user?")) return;
-        try {
-            await updateUserStatus(id, 'rejected');
-            setPendingUsers(prev => prev.filter(u => u.id !== id));
-            alert("User rejected and removed from database");
-        } catch (error) {
-            alert("Failed to reject user");
-        }
+    const getRoleBadge = (roleName) => {
+        const map = { intern: 'primary', teamlead: 'warning', hr: 'secondary', admin: 'secondary' };
+        return map[roleName] || 'secondary';
     };
 
     return (
         <DashboardLayout role="HR">
-            <header id="overview" className="flex justify-between items-center" style={{ marginBottom: '2rem' }}>
+            {/* ── Page Header ── */}
+            <header className="flex justify-between items-center mb-8">
                 <div>
                     <h2 style={{ margin: 0 }}>HR Dashboard</h2>
-                    <p className="text-muted">Manage Interns and Approvals</p>
+                    <p className="text-muted" style={{ marginTop: '0.25rem' }}>
+                        Oversee registrations, approve members, and manage system access.
+                    </p>
                 </div>
+                <Button to="/hr/approvals" variant="primary">
+                    <i className="fa-solid fa-user-clock" style={{ marginRight: '0.5rem' }}></i>
+                    Review Pending
+                    {stats.pending > 0 && (
+                        <span style={{
+                            marginLeft: '0.5rem',
+                            background: 'rgba(255,255,255,0.3)',
+                            borderRadius: '999px',
+                            padding: '0 6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                        }}>
+                            {stats.pending}
+                        </span>
+                    )}
+                </Button>
             </header>
 
+            {/* ── KPI Cards ── */}
             <div className="grid grid-responsive gap-6 mb-8">
-                {/* KPI Cards */}
-                <Card className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                        <div className="text-muted" style={{ fontSize: '0.875rem' }}>Pending Approvals</div>
-                        <span className="badge badge-warning">Action Needed</span>
-                    </div>
-                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--warning)' }}>{pendingUsers.length}</div>
-                </Card>
+                {kpiCards.map((card) => (
+                    <Card key={card.label} className="p-6" style={{ position: 'relative', overflow: 'hidden' }}>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="text-muted" style={{ fontSize: '0.8125rem', marginBottom: '0.5rem' }}>
+                                    {card.label}
+                                </div>
+                                <div style={{ fontSize: '2.25rem', fontWeight: 800, color: card.color, lineHeight: 1 }}>
+                                    {loading ? '—' : card.value}
+                                </div>
+                                {card.badge && (
+                                    <span className={`badge badge-${card.badgeColor}`} style={{ marginTop: '0.5rem' }}>
+                                        {card.badge}
+                                    </span>
+                                )}
+                            </div>
+                            <div style={{
+                                width: 48, height: 48,
+                                background: card.bg,
+                                borderRadius: 'var(--radius-lg)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <i className={`fa-solid ${card.icon}`} style={{ fontSize: '1.25rem', color: card.color }}></i>
+                            </div>
+                        </div>
+                        {/* Decorative bar */}
+                        <div style={{
+                            position: 'absolute', bottom: 0, left: 0, right: 0,
+                            height: '3px', background: card.color, opacity: 0.4,
+                        }} />
+                    </Card>
+                ))}
             </div>
 
-            {/* Pending Approvals List */}
-            <Card id="approvals" className="mb-8" style={{ padding: 0 }}>
-                <div className="p-4 border-b" style={{ borderBottom: '1px solid var(--border)' }}>
-                    <h4 style={{ margin: 0, fontSize: '1rem' }}>Pending Account Requests</h4>
+            {/* ── Recent Pending Requests ── */}
+            <Card style={{ padding: 0 }} className="mb-8">
+                <div className="flex justify-between items-center p-4" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <h4 style={{ margin: 0 }}>
+                        <i className="fa-solid fa-user-clock text-primary" style={{ marginRight: '0.5rem' }}></i>
+                        Recent Pending Requests
+                    </h4>
+                    <Link to="/hr/approvals" style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 600 }}>
+                        View All <i className="fa-solid fa-arrow-right" style={{ marginLeft: '0.25rem' }}></i>
+                    </Link>
                 </div>
-                {pendingUsers.length === 0 ? (
-                    <div className="p-4 text-center text-muted">No pending requests.</div>
+
+                {loading ? (
+                    <div className="p-8 text-center text-muted">
+                        <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}></i>
+                        <p>Loading...</p>
+                    </div>
+                ) : recentPending.length === 0 ? (
+                    <div className="p-8 text-center">
+                        <i className="fa-solid fa-circle-check" style={{ fontSize: '2.5rem', color: 'var(--success)', marginBottom: '0.75rem', display: 'block' }}></i>
+                        <p className="font-medium">All caught up!</p>
+                        <p className="text-muted" style={{ fontSize: '0.875rem' }}>No pending approval requests at this time.</p>
+                    </div>
                 ) : (
-                    <div className="divide-y divide-gray-200">
-                        {pendingUsers.map(user => (
-                            <div key={user.id} className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style={{ borderBottom: '1px solid var(--border)' }}>
+                    <div>
+                        {recentPending.map((user, idx) => (
+                            <div
+                                key={user.id}
+                                className="flex justify-between items-center p-4"
+                                style={{
+                                    borderBottom: idx < recentPending.length - 1 ? '1px solid var(--border)' : 'none',
+                                    transition: 'background 0.2s',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-body)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                            >
                                 <div className="flex items-center gap-3">
-                                    <div className="avatar-sm" style={{ width: '40px', height: '40px', background: '#eee', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                        {user.name.charAt(0)}
+                                    {/* Avatar */}
+                                    <div style={{
+                                        width: 42, height: 42,
+                                        borderRadius: '50%',
+                                        background: 'var(--gradient-primary)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: 'white', fontWeight: 700, fontSize: '1rem',
+                                        flexShrink: 0,
+                                    }}>
+                                        {user.name?.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 600 }}>{user.name}</div>
-                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{user.email}</div>
-                                        <div className="flex gap-2 mt-1">
-                                            <span className="badge badge-secondary text-xs">{user.role?.name || 'Unknown Role'}</span>
-                                            {user.technology && <span className="badge badge-primary text-xs">{user.technology.name}</span>}
+                                        <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{user.name}</div>
+                                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{user.email}</div>
+                                        <div className="flex gap-2" style={{ marginTop: '0.25rem' }}>
+                                            <span className={`badge badge-${getRoleBadge(user.role?.name)}`}>
+                                                {user.role?.name || 'Unknown'}
+                                            </span>
+                                            {user.technology && (
+                                                <span className="badge badge-secondary">{user.technology.name}</span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex gap-2 w-full md:w-auto">
-                                    <Button variant="success" size="sm" onClick={() => handleApprove(user.id)}>
-                                        <i className="fa-solid fa-check mr-1"></i> Approve
-                                    </Button>
-                                    <Button variant="danger" size="sm" onClick={() => handleReject(user.id)}>
-                                        <i className="fa-solid fa-xmark mr-1"></i> Reject
-                                    </Button>
+                                <div className="flex items-center gap-3">
+                                    <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+                                        {formatDate(user.created_at)}
+                                    </span>
+                                    <Link to="/hr/approvals">
+                                        <Button variant="secondary" size="sm">
+                                            Review <i className="fa-solid fa-arrow-right" style={{ marginLeft: '0.25rem' }}></i>
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
             </Card>
+
+            {/* ── Quick Actions ── */}
+            <div className="grid grid-cols-2 gap-6">
+                <Card className="p-6">
+                    <h4 style={{ marginBottom: '0.75rem' }}>
+                        <i className="fa-solid fa-bolt text-primary" style={{ marginRight: '0.5rem' }}></i>
+                        Quick Actions
+                    </h4>
+                    <div className="flex flex-col gap-3">
+                        <Button to="/hr/approvals" variant="primary" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+                            <i className="fa-solid fa-user-check"></i> Review Pending Approvals
+                        </Button>
+                        <Button to="/hr/members" variant="secondary" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+                            <i className="fa-solid fa-users"></i> View All Members
+                        </Button>
+                        <Button to="/hr/audit-log" variant="secondary" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+                            <i className="fa-solid fa-clipboard-list"></i> View Audit Log
+                        </Button>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <h4 style={{ marginBottom: '0.75rem' }}>
+                        <i className="fa-solid fa-circle-info text-primary" style={{ marginRight: '0.5rem' }}></i>
+                        System Status
+                    </h4>
+                    <div className="flex flex-col gap-3">
+                        {[
+                            { label: 'Approval Rate', value: stats.total > 0 ? `${Math.round((stats.approved / stats.total) * 100)}%` : '—', color: 'var(--success)' },
+                            { label: 'Rejection Rate', value: stats.total > 0 ? `${Math.round((stats.rejected / stats.total) * 100)}%` : '—', color: 'var(--danger)' },
+                            { label: 'Pending Rate', value: stats.total > 0 ? `${Math.round((stats.pending / stats.total) * 100)}%` : '—', color: 'var(--warning)' },
+                        ].map(item => (
+                            <div key={item.label} className="flex justify-between items-center">
+                                <span className="text-muted" style={{ fontSize: '0.875rem' }}>{item.label}</span>
+                                <span style={{ fontWeight: 700, color: item.color }}>{loading ? '—' : item.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+            </div>
         </DashboardLayout>
     );
 };

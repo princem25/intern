@@ -14,6 +14,10 @@ export const leadLinks = [
 ];
 
 export const hrLinks = [
-    // Placeholder for HR links if needed
     { text: 'Dashboard', icon: 'fa-house', path: '/hr/dashboard' },
+    { text: 'Pending Approvals', icon: 'fa-user-clock', path: '/hr/approvals' },
+    { text: 'Assign Team Lead', icon: 'fa-user-tie', path: '/hr/assignments' },
+    { text: 'All Members', icon: 'fa-users', path: '/hr/members' },
+    { text: 'Audit Log', icon: 'fa-clipboard-list', path: '/hr/audit-log' },
 ];
+

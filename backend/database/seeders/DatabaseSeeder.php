@@ -69,5 +69,8 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         }
+
+        // Seed some tasks
+        $this->call(TaskSeeder::class);
     }
 }

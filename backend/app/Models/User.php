@@ -26,6 +26,9 @@ class User extends Authenticatable
         'role_id',
         'technology_id',
         'status',
+        'team_lead_id',
+        'is_active',
+        'assigned_at',
     ];
 
     /**
@@ -47,9 +50,13 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'assigned_at'       => 'datetime',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
         ];
     }
+
+    // ── Relationships ──────────────────────────────────────────────────────
 
     public function role()
     {
@@ -59,5 +66,21 @@ class User extends Authenticatable
     public function technology()
     {
         return $this->belongsTo(Technology::class);
+    }
+
+    /**
+     * The team lead assigned to this intern.
+     */
+    public function teamLead()
+    {
+        return $this->belongsTo(User::class, 'team_lead_id');
+    }
+
+    /**
+     * Interns assigned to this team lead.
+     */
+    public function interns()
+    {
+        return $this->hasMany(User::class, 'team_lead_id');
     }
 }

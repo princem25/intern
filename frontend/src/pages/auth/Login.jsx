@@ -85,14 +85,6 @@ const Login = () => {
                     Don't have an account? <Link to="/auth/register" className="text-primary font-medium">Create account</Link>
                 </div>
 
-                <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                    <p className="text-muted" style={{ fontSize: '0.75rem', marginBottom: '0.75rem' }}>Quick Access (Demo)</p>
-                    <div className="flex justify-center gap-2">
-                        <button onClick={() => navigate('/intern/dashboard')} className="badge badge-success cursor-pointer" style={{ border: '1px solid currentColor', background: 'transparent', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Intern</button>
-                        <button onClick={() => navigate('/lead/dashboard')} className="badge badge-warning cursor-pointer" style={{ border: '1px solid currentColor', background: 'transparent', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Team Lead</button>
-                        <button onClick={() => navigate('/hr/dashboard')} className="badge badge-danger cursor-pointer" style={{ border: '1px solid currentColor', background: 'transparent', padding: '0.5rem 1rem', fontSize: '0.875rem' }}>HR</button>
-                    </div>
-                </div>
             </div>
         </div>
     );
