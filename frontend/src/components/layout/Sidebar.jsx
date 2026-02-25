@@ -1,7 +1,16 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { logout } from '../../api/auth';
 
 export const Sidebar = ({ links, role = 'Intern', onToggle }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        await logout();
+        navigate('/auth/login', { replace: true });
+    };
+
     return (
         <aside className="sidebar">
             <div className="sidebar-header"
@@ -41,11 +50,16 @@ export const Sidebar = ({ links, role = 'Intern', onToggle }) => {
             </nav>
 
             <div style={{ padding: '1rem', borderTop: '1px solid var(--border)' }}>
-                <NavLink to="/auth/login" className="menu-item" style={{ color: 'var(--danger)' }}>
+                <button
+                    className="menu-item"
+                    style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                    onClick={handleLogout}
+                >
                     <i className="fa-solid fa-right-from-bracket"></i>
                     <span>Logout</span>
-                </NavLink>
+                </button>
             </div>
         </aside>
     );
 };
+

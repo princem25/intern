@@ -74,6 +74,7 @@ const TaskModal = ({ task, onClose, onSaved, leadInterns }) => {
                         ) : (
                             <select value={form.assigned_to} onChange={e => set('assigned_to', e.target.value)} style={inp}>
                                 <option value="">— Select Intern —</option>
+                                <option value="all">📋 All Interns ({leadInterns.length})</option>
                                 {leadInterns.map(i => <option key={i.id} value={i.id}>{i.name} ({i.email})</option>)}
                             </select>
                         )}
@@ -105,8 +106,8 @@ const LeadTopics = () => {
 
     useEffect(() => {
         if (!user.id) return;
-        // /hr/assignments/my-interns returns a plain array of the lead's interns
-        fetch(`http://127.0.0.1:8000/api/hr/assignments/my-interns`, { headers: getAuthHeaders() })
+        // /my-interns returns a plain array of the lead's interns
+        fetch(`http://127.0.0.1:8000/api/my-interns`, { headers: getAuthHeaders() })
             .then(async r => {
                 if (!r.ok) {
                     const body = await r.text().catch(() => '');

@@ -2,6 +2,7 @@ import React from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import PublicRoute from './components/auth/PublicRoute';
 
 // ─── Auth Pages ───────────────────────────────────────────────────────────────
 import Landing from './pages/Landing';
@@ -40,10 +41,10 @@ function App() {
 
           {/* ── Public Routes ───────────────────────────────────────────── */}
           <Route path="/" element={<Landing />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/login" element={<PublicRoute><Login /></PublicRoute>} />
+          <Route path="/auth/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/auth/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+          <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
           {/* ── Intern Routes ───────────────────────────────────────────── */}
           <Route path="/intern">

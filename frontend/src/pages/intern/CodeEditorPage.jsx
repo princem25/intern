@@ -27,6 +27,7 @@ const LANGUAGES = [
     { id: 'typescript', label: 'TypeScript', ext: '.ts', monacoLang: 'typescript', starter: 'const msg: string = "Hello, World!";\nconsole.log(msg);\n' },
     { id: 'go', label: 'Go', ext: '.go', monacoLang: 'go', starter: 'package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello, World!")\n}\n' },
     { id: 'bash', label: 'Bash', ext: '.sh', monacoLang: 'shell', starter: '#!/bin/bash\necho "Hello, World!"\n' },
+    { id: 'sql', label: 'SQL', ext: '.sql', monacoLang: 'sql', starter: '-- SQL (SQLite)\nCREATE TABLE users (\n    id INTEGER PRIMARY KEY,\n    name TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nINSERT INTO users (name, email) VALUES ("Alice", "alice@example.com");\nSELECT * FROM users;\n' },
 ];
 
 const DiffBadge = ({ level }) => {
@@ -82,6 +83,10 @@ const CodeEditorPage = () => {
     const [panelH, setPanelH] = useState(220);
     const [wordWrap, setWordWrap] = useState('off');
 
+    // ── Copy-paste detection ────────────────────────────────────────────────
+    const pasteAttempts = useRef([]);
+    const [pasteCount, setPasteCount] = useState(0);
+
     const autoSaveTimer = useRef(null);
     const editorRef = useRef(null);
     const { log, trackKeydown } = useActivityTracker(taskId);
@@ -108,20 +113,53 @@ const CodeEditorPage = () => {
         })();
     }, [taskId]);
 
-    // ── Security: disable paste & drag-drop ────────────────────────────────
+    // ── Security: copy-paste detection & drag-drop prevention ────────────
     useEffect(() => {
-        const preventPaste = (e) => {
+        const handlePaste = (e) => {
             e.preventDefault();
-            showToast('Paste is disabled. Type your code directly.', 'warn');
+            const pastedText = e.clipboardData?.getData('text') || '';
+            const attempt = {
+                timestamp: new Date().toISOString(),
+                textLength: pastedText.length,
+                preview: pastedText.substring(0, 80) + (pastedText.length > 80 ? '…' : ''),
+            };
+            pasteAttempts.current.push(attempt);
+            setPasteCount(c => c + 1);
+            log('paste_attempt', { textLength: pastedText.length });
+            showToast(`⚠ Paste blocked! Attempt #${pasteAttempts.current.length} recorded.`, 'error');
         };
-        const preventDrop = (e) => e.preventDefault();
-        document.addEventListener('paste', preventPaste);
-        document.addEventListener('drop', preventDrop);
+
+        const handleCopy = (e) => {
+            // Allow internal copy (e.g., within the editor) but log it
+            log('copy', { timestamp: new Date().toISOString() });
+        };
+
+        const preventDrop = (e) => {
+            e.preventDefault();
+            showToast('Drag & drop is disabled.', 'warn');
+        };
+
+        // Capture context menu to prevent right-click paste
+        const preventContextMenu = (e) => {
+            const editorEl = document.querySelector('.monaco-editor');
+            if (editorEl && editorEl.contains(e.target)) {
+                e.preventDefault();
+            }
+        };
+
+        document.addEventListener('paste', handlePaste, true);
+        document.addEventListener('copy', handleCopy);
+        document.addEventListener('drop', preventDrop, true);
+        document.addEventListener('dragover', (e) => e.preventDefault(), true);
+        document.addEventListener('contextmenu', preventContextMenu);
+
         return () => {
-            document.removeEventListener('paste', preventPaste);
-            document.removeEventListener('drop', preventDrop);
+            document.removeEventListener('paste', handlePaste, true);
+            document.removeEventListener('copy', handleCopy);
+            document.removeEventListener('drop', preventDrop, true);
+            document.removeEventListener('contextmenu', preventContextMenu);
         };
-    }, []);
+    }, [log]);
 
     // ── Auto-save every 30s ─────────────────────────────────────────────────
     useEffect(() => {
@@ -387,9 +425,15 @@ const CodeEditorPage = () => {
                     </div>
 
                     {/* Security notice */}
-                    <div style={{ margin: '0 1rem 1rem', padding: '0.75rem', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', fontSize: '0.72rem', color: '#f87171', lineHeight: 1.5 }}>
+                    <div style={{ margin: '0 1rem 1rem', padding: '0.75rem', background: pasteCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.07)', border: `1px solid ${pasteCount > 0 ? 'rgba(239,68,68,0.5)' : 'rgba(239,68,68,0.2)'}`, borderRadius: '8px', fontSize: '0.72rem', color: '#f87171', lineHeight: 1.5, transition: 'all 0.3s' }}>
                         <i className="fa-solid fa-shield-halved" style={{ marginRight: '0.4rem' }}></i>
-                        Paste &amp; file imports disabled. All work must be typed directly.
+                        Paste, drag-drop &amp; right-click disabled. All work must be typed directly.
+                        {pasteCount > 0 && (
+                            <div style={{ marginTop: '0.5rem', padding: '0.4rem 0.6rem', background: 'rgba(239,68,68,0.2)', borderRadius: '6px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                <i className="fa-solid fa-triangle-exclamation"></i>
+                                {pasteCount} paste attempt{pasteCount > 1 ? 's' : ''} detected &amp; logged
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -216,4 +216,116 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'User status updated.', 'user' => $targetUser]);
     }
+
+    // ── Leaderboard ──────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/leaderboard
+     * Returns all approved interns ranked by total score (sum of reviewed task scores).
+     * Includes task counts and average score.
+     */
+    public function leaderboard(Request $request)
+    {
+        $currentUser = $request->user();
+
+        // Get the intern role id
+        $internRole = Role::where('name', 'intern')->first();
+        if (!$internRole) {
+            return response()->json([]);
+        }
+
+        // Fetch all approved interns with their task stats
+        $interns = User::where('role_id', $internRole->id)
+            ->where('status', 'approved')
+            ->with('technology')
+            ->get(['id', 'name', 'email', 'technology_id', 'created_at']);
+
+        $leaderboard = $interns->map(function ($intern) use ($currentUser) {
+            $tasks = \App\Models\Task::where('assigned_to', $intern->id);
+
+            $totalTasks   = (clone $tasks)->count();
+            $doneTasks    = (clone $tasks)->where('status', 'done')->count();
+            $totalScore   = (clone $tasks)->whereNotNull('score')->sum('score');
+            $avgScore     = (clone $tasks)->whereNotNull('score')->avg('score');
+            $reviewedCount= (clone $tasks)->whereNotNull('score')->count();
+
+            return [
+                'id'              => $intern->id,
+                'name'            => $intern->name,
+                'email'           => $intern->email,
+                'avatar'          => strtoupper(collect(explode(' ', $intern->name))->map(fn($w) => $w[0] ?? '')->take(2)->join('')),
+                'technology'      => $intern->technology?->name ?? '—',
+                'total_tasks'     => $totalTasks,
+                'done_tasks'      => $doneTasks,
+                'total_score'     => (int) $totalScore,
+                'avg_score'       => $avgScore ? round($avgScore, 1) : 0,
+                'reviewed_tasks'  => $reviewedCount,
+                'is_current_user' => $currentUser->id === $intern->id,
+                'joined'          => $intern->created_at,
+            ];
+        })
+        ->sortByDesc('total_score')
+        ->values()
+        ->map(function ($item, $index) {
+            $item['rank'] = $index + 1;
+            return $item;
+        });
+
+        return response()->json($leaderboard);
+    }
+
+    // ── Profile Update ───────────────────────────────────────────────────────
+
+    /**
+     * PUT /api/profile
+     * Update authenticated user's name and/or email.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'name'  => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        $user->update($data);
+
+        // Update localStorage data on the frontend side
+        return response()->json([
+            'message' => 'Profile updated successfully.',
+            'user'    => $user->load(['role', 'technology']),
+        ]);
+    }
+
+    // ── Change Password ──────────────────────────────────────────────────────
+
+    /**
+     * PUT /api/change-password
+     * Changes the authenticated user's password after verifying the current one.
+     */
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password'     => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect.',
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json([
+            'message' => 'Password changed successfully.',
+        ]);
+    }
 }
+

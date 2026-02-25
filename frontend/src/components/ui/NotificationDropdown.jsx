@@ -1,9 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getCurrentUser } from '../../api/auth';
 
 export const NotificationDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
+
+    // Determine notifications link based on role
+    const currentUser = getCurrentUser();
+    const role = currentUser?.role?.name;
+    const notifLink = role === 'teamlead' || role === 'admin'
+        ? '/lead/dashboard'
+        : role === 'hr'
+            ? '/hr/dashboard'
+            : '/intern/notifications';
 
     // Sample notifications data
     const notifications = [
@@ -127,7 +137,7 @@ export const NotificationDropdown = () => {
                     </div>
 
                     <div className="notification-footer">
-                        <Link to="/intern/notifications" style={{ textDecoration: 'none' }}>
+                        <Link to={notifLink} style={{ textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
                             <button className="btn btn-link" style={{ width: '100%', textAlign: 'center' }}>
                                 View All Notifications
                             </button>
@@ -138,3 +148,4 @@ export const NotificationDropdown = () => {
         </div>
     );
 };
+

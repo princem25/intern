@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // ── Judge0 CE — Code Execution Engine ─────────────────────────────────────
+    'judge0' => [
+        'api_key'  => env('JUDGE0_API_KEY'),
+        'api_host' => env('JUDGE0_API_HOST', 'judge0-ce.p.rapidapi.com'),
+    ],
+
 ];
+

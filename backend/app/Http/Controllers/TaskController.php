@@ -49,7 +49,8 @@ class TaskController extends Controller
 
     /**
      * POST /api/tasks
-     * Team Lead creates a task and assigns it to one of their interns.
+     * Team Lead creates a task and assigns it to one intern OR all interns.
+     * When assigned_to = 'all', a separate task is created for each intern.
      */
     public function store(Request $request)
     {
@@ -59,9 +60,45 @@ class TaskController extends Controller
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'difficulty'  => 'nullable|in:basic,medium,hard',
-            'assigned_to' => 'required|exists:users,id',
+            'assigned_to' => 'required',  // can be an intern id or "all"
             'due_date'    => 'nullable|date',
         ]);
+
+        // ── Assign to ALL interns under this lead ────────────────────────────
+        if ($data['assigned_to'] === 'all') {
+            $internIds = User::where('team_lead_id', $user->id)->pluck('id');
+
+            if ($internIds->isEmpty()) {
+                return response()->json([
+                    'message' => 'No interns are assigned to you yet.',
+                ], 422);
+            }
+
+            $tasks = [];
+            foreach ($internIds as $internId) {
+                $tasks[] = Task::create([
+                    'title'       => $data['title'],
+                    'description' => $data['description'] ?? null,
+                    'difficulty'  => $data['difficulty'] ?? null,
+                    'due_date'    => $data['due_date'] ?? null,
+                    'creator_id'  => $user->id,
+                    'assigned_to' => $internId,
+                    'status'      => 'todo',
+                ]);
+            }
+
+            return response()->json([
+                'message' => count($tasks) . ' task(s) created for all interns.',
+                'count'   => count($tasks),
+                'tasks'   => collect($tasks)->map(fn($t) => $t->load(['assignee:id,name,email', 'creator:id,name'])),
+            ], 201);
+        }
+
+        // ── Assign to single intern ──────────────────────────────────────────
+        // Validate that the intern exists
+        if (!User::where('id', $data['assigned_to'])->exists()) {
+            return response()->json(['message' => 'Intern not found.'], 422);
+        }
 
         $data['creator_id'] = $user->id;
         $data['status']     = 'todo';
@@ -70,6 +107,7 @@ class TaskController extends Controller
 
         return response()->json($task->load(['assignee:id,name,email', 'creator:id,name']), 201);
     }
+
 
     /**
      * GET /api/tasks/{id}

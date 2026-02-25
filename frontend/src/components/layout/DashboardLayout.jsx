@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { internLinks, leadLinks, hrLinks } from '../../data/navigation';
+import { getCurrentUser } from '../../api/auth';
 
 export const DashboardLayout = ({ children, role = 'Intern', fullWidth = false }) => {
     // Desktop: sidebar open by default, Mobile: sidebar closed by default
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
+
+    // Read real logged-in user from localStorage
+    const currentUser = getCurrentUser();
 
     React.useEffect(() => {
         const handleResize = () => {
@@ -40,7 +44,7 @@ export const DashboardLayout = ({ children, role = 'Intern', fullWidth = false }
             <div className="main-content flex-1 flex flex-col transition-all duration-300">
                 <Topbar
                     onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-                    user={{ initials: 'JD' }} // Placeholder
+                    user={currentUser}
                 />
                 <main className={fullWidth ? 'flex-1 flex flex-col overflow-hidden' : ''} style={fullWidth ? {} : { padding: '2rem', maxWidth: '100%', width: '100%' }}>
                     {children}
@@ -49,3 +53,4 @@ export const DashboardLayout = ({ children, role = 'Intern', fullWidth = false }
         </div>
     );
 };
+

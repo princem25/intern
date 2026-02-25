@@ -1,188 +1,184 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import config from '../../config';
+
+const apiFetch = async (url) => {
+    const token = localStorage.getItem('auth_token');
+    const r = await fetch(url, {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${token}` },
+    });
+    if (r.status === 401) { localStorage.removeItem('auth_token'); localStorage.removeItem('user'); window.location.href = '/auth/login'; return null; }
+    if (!r.ok) throw new Error('Failed to fetch');
+    return r.json();
+};
 
 const Leaderboard = () => {
-    const [timeFilter, setTimeFilter] = useState('week'); // week, month, allTime
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    // Sample leaderboard data
-    const leaderboardData = {
-        week: [
-            { rank: 1, name: 'Sarah Connor', avatar: 'SC', points: 850, tasksCompleted: 12, streak: 7, change: 'up' },
-            { rank: 2, name: 'John Doe', avatar: 'JD', points: 820, tasksCompleted: 11, streak: 5, change: 'same', isCurrentUser: true },
-            { rank: 3, name: 'Alice Johnson', avatar: 'AJ', points: 780, tasksCompleted: 10, streak: 6, change: 'down' },
-            { rank: 4, name: 'Bob Smith', avatar: 'BS', points: 750, tasksCompleted: 9, streak: 4, change: 'up' },
-            { rank: 5, name: 'Emma Wilson', avatar: 'EW', points: 720, tasksCompleted: 9, streak: 3, change: 'up' },
-            { rank: 6, name: 'Michael Brown', avatar: 'MB', points: 690, tasksCompleted: 8, streak: 5, change: 'down' },
-            { rank: 7, name: 'Olivia Davis', avatar: 'OD', points: 650, tasksCompleted: 8, streak: 2, change: 'same' },
-            { rank: 8, name: 'James Miller', avatar: 'JM', points: 620, tasksCompleted: 7, streak: 4, change: 'up' },
-            { rank: 9, name: 'Sophia Garcia', avatar: 'SG', points: 590, tasksCompleted: 7, streak: 3, change: 'down' },
-            { rank: 10, name: 'William Martinez', avatar: 'WM', points: 560, tasksCompleted: 6, streak: 2, change: 'same' }
-        ],
-        month: [
-            { rank: 1, name: 'Sarah Connor', avatar: 'SC', points: 3200, tasksCompleted: 45, streak: 28, change: 'up' },
-            { rank: 2, name: 'Alice Johnson', avatar: 'AJ', points: 3100, tasksCompleted: 42, streak: 25, change: 'up' },
-            { rank: 3, name: 'John Doe', avatar: 'JD', points: 2950, tasksCompleted: 40, streak: 20, change: 'down', isCurrentUser: true },
-            { rank: 4, name: 'Bob Smith', avatar: 'BS', points: 2800, tasksCompleted: 38, streak: 18, change: 'same' },
-            { rank: 5, name: 'Emma Wilson', avatar: 'EW', points: 2650, tasksCompleted: 35, streak: 15, change: 'up' }
-        ],
-        allTime: [
-            { rank: 1, name: 'Sarah Connor', avatar: 'SC', points: 15200, tasksCompleted: 180, streak: 120, change: 'up' },
-            { rank: 2, name: 'Alice Johnson', avatar: 'AJ', points: 14800, tasksCompleted: 175, streak: 115, change: 'same' },
-            { rank: 3, name: 'Bob Smith', avatar: 'BS', points: 13500, tasksCompleted: 160, streak: 100, change: 'up' },
-            { rank: 4, name: 'John Doe', avatar: 'JD', points: 12900, tasksCompleted: 155, streak: 95, change: 'down', isCurrentUser: true },
-            { rank: 5, name: 'Emma Wilson', avatar: 'EW', points: 11200, tasksCompleted: 140, streak: 85, change: 'up' }
-        ]
-    };
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await apiFetch(`${config.API_BASE_URL}/leaderboard`);
+                if (res) setData(res);
+            } catch { setError('Failed to load leaderboard.'); }
+            finally { setLoading(false); }
+        })();
+    }, []);
 
-    const currentData = leaderboardData[timeFilter];
-    const currentUser = currentData.find(user => user.isCurrentUser);
+    const currentUser = data.find(u => u.is_current_user);
+    const top3 = data.slice(0, 3);
 
-    const getRankIcon = (rank) => {
+    const getRankDisplay = (rank) => {
         if (rank === 1) return '🥇';
         if (rank === 2) return '🥈';
         if (rank === 3) return '🥉';
-        return rank;
+        return `#${rank}`;
     };
 
-    const getChangeIcon = (change) => {
-        if (change === 'up') return <i className="fa-solid fa-arrow-up" style={{ color: 'var(--success)', fontSize: '0.9rem' }}></i>;
-        if (change === 'down') return <i className="fa-solid fa-arrow-down" style={{ color: 'var(--danger)', fontSize: '0.9rem' }}></i>;
-        return <i className="fa-solid fa-minus" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}></i>;
+    const getRankColor = (rank) => {
+        if (rank === 1) return '#FFD700';
+        if (rank === 2) return '#C0C0C0';
+        if (rank === 3) return '#CD7F32';
+        return 'var(--primary)';
     };
+
+    const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd for visual podium
 
     return (
         <DashboardLayout role="Intern">
+            <style>{`
+                .lb-podium { display: flex; justify-content: center; align-items: flex-end; gap: 1rem; margin-bottom: 2rem; }
+                .lb-podium-card { display: flex; flex-direction: column; align-items: center; padding: 1.25rem 1rem; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--border); transition: all 0.3s; min-width: 140px; }
+                .lb-podium-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+                .lb-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; color: white; margin-bottom: 0.75rem; }
+                .lb-avatar-sm { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: white; flex-shrink: 0; }
+                .lb-row { display: grid; grid-template-columns: 50px 1fr 90px 90px 90px; align-items: center; padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border); transition: background 0.15s; gap: 0.5rem; }
+                .lb-row:hover { background: rgba(99,102,241,0.04); }
+                .lb-row.current { background: rgba(99,102,241,0.08); border-left: 3px solid var(--primary); }
+                .lb-header { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--border); }
+                @media (max-width: 640px) {
+                    .lb-row { grid-template-columns: 40px 1fr 70px 70px; }
+                    .lb-row .hide-mobile { display: none; }
+                    .lb-podium { flex-direction: column; align-items: center; }
+                }
+            `}</style>
+
             <div style={{ marginBottom: '2rem' }}>
                 {/* Header */}
-                <div className="flex justify-between items-center mb-6" style={{ flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                        <h1 style={{ margin: 0, marginBottom: '0.5rem' }}>🏆 Leaderboard</h1>
-                        <p className="text-muted" style={{ margin: 0 }}>
-                            Compete with fellow interns and climb the ranks!
-                        </p>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant={timeFilter === 'week' ? 'primary' : 'secondary'}
-                            onClick={() => setTimeFilter('week')}
-                        >
-                            This Week
-                        </Button>
-                        <Button
-                            variant={timeFilter === 'month' ? 'primary' : 'secondary'}
-                            onClick={() => setTimeFilter('month')}
-                        >
-                            This Month
-                        </Button>
-                        <Button
-                            variant={timeFilter === 'allTime' ? 'primary' : 'secondary'}
-                            onClick={() => setTimeFilter('allTime')}
-                        >
-                            All Time
-                        </Button>
-                    </div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <h1 style={{ margin: 0, marginBottom: '0.35rem', fontSize: '1.5rem' }}>🏆 Leaderboard</h1>
+                    <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        Rankings based on total scores from reviewed tasks
+                    </p>
                 </div>
 
-                {/* Current User Stats */}
-                {currentUser && (
-                    <Card className="p-6 mb-6" style={{ background: 'var(--gradient-primary)', color: 'white' }}>
-                        <div className="flex justify-between items-center" style={{ flexWrap: 'wrap', gap: '1.5rem' }}>
-                            <div className="flex items-center gap-4">
-                                <div className="leaderboard-avatar-large" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                                    {currentUser.avatar}
-                                </div>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', color: 'white' }}>Your Rank: #{currentUser.rank}</h2>
-                                    <p style={{ margin: 0, opacity: 0.9 }}>{currentUser.name}</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-6" style={{ flexWrap: 'wrap' }}>
-                                <div className="text-center">
-                                    <div style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.25rem' }}>{currentUser.points}</div>
-                                    <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>Points</div>
-                                </div>
-                                <div className="text-center">
-                                    <div style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.25rem' }}>{currentUser.tasksCompleted}</div>
-                                    <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>Tasks</div>
-                                </div>
-                                <div className="text-center">
-                                    <div style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.25rem' }}>🔥 {currentUser.streak}</div>
-                                    <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>Day Streak</div>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                )}
-
-                {/* Top 3 Podium */}
-                <div className="leaderboard-podium mb-6">
-                    {currentData.slice(0, 3).sort((a, b) => {
-                        const order = { 2: 0, 1: 1, 3: 2 };
-                        return order[a.rank] - order[b.rank];
-                    }).map((user) => (
-                        <div key={user.rank} className={`podium-place podium-${user.rank}`}>
-                            <div className="podium-avatar">
-                                {user.avatar}
-                            </div>
-                            <div className="podium-rank">{getRankIcon(user.rank)}</div>
-                            <div className="podium-name">{user.name}</div>
-                            <div className="podium-points">{user.points} pts</div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Full Leaderboard Table */}
-                <Card>
-                    <div className="leaderboard-table">
-                        <div className="leaderboard-header">
-                            <div className="leaderboard-col-rank">Rank</div>
-                            <div className="leaderboard-col-user">User</div>
-                            <div className="leaderboard-col-stat">Points</div>
-                            <div className="leaderboard-col-stat">Tasks</div>
-                            <div className="leaderboard-col-stat">Streak</div>
-                            <div className="leaderboard-col-change">Trend</div>
-                        </div>
-                        {currentData.map((user) => (
-                            <div
-                                key={user.rank}
-                                className={`leaderboard-row ${user.isCurrentUser ? 'leaderboard-row-current' : ''}`}
-                            >
-                                <div className="leaderboard-col-rank">
-                                    <span className="leaderboard-rank-badge">
-                                        {getRankIcon(user.rank)}
-                                    </span>
-                                </div>
-                                <div className="leaderboard-col-user">
-                                    <div className="flex items-center gap-3">
-                                        <div className="leaderboard-avatar">
-                                            {user.avatar}
-                                        </div>
-                                        <span style={{ fontWeight: user.isCurrentUser ? 600 : 500 }}>
-                                            {user.name}
-                                            {user.isCurrentUser && (
-                                                <span className="badge badge-primary" style={{ marginLeft: '0.5rem', fontSize: '0.7rem' }}>
-                                                    You
-                                                </span>
-                                            )}
-                                        </span>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                        <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }}></i> Loading leaderboard…
+                    </div>
+                ) : error ? (
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#EF4444' }}>{error}</div>
+                ) : data.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '4rem', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}>
+                        <i className="fa-solid fa-trophy" style={{ fontSize: '3rem', color: 'var(--border)', display: 'block', marginBottom: '1rem' }}></i>
+                        <p style={{ fontWeight: 600 }}>No interns yet</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>The leaderboard will populate once interns have completed and been reviewed on tasks.</p>
+                    </div>
+                ) : (
+                    <>
+                        {/* Current user rank banner */}
+                        {currentUser && (
+                            <div style={{ background: 'var(--gradient-primary)', borderRadius: '14px', padding: '1.25rem 1.5rem', color: 'white', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem' }}>
+                                        {currentUser.avatar}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 800, fontSize: '1.15rem' }}>Your Rank: #{currentUser.rank}</div>
+                                        <div style={{ opacity: 0.85, fontSize: '0.85rem' }}>{currentUser.name}</div>
                                     </div>
                                 </div>
-                                <div className="leaderboard-col-stat">
-                                    <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{user.points}</span>
-                                </div>
-                                <div className="leaderboard-col-stat">{user.tasksCompleted}</div>
-                                <div className="leaderboard-col-stat">
-                                    🔥 {user.streak}
-                                </div>
-                                <div className="leaderboard-col-change">
-                                    {getChangeIcon(user.change)}
+                                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.4rem' }}>{currentUser.total_score}</div>
+                                        <div style={{ fontSize: '0.75rem', opacity: 0.85 }}>Total Score</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.4rem' }}>{currentUser.done_tasks}</div>
+                                        <div style={{ fontSize: '0.75rem', opacity: 0.85 }}>Completed</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.4rem' }}>{currentUser.avg_score || '—'}</div>
+                                        <div style={{ fontSize: '0.75rem', opacity: 0.85 }}>Avg Score</div>
+                                    </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </Card>
+                        )}
+
+                        {/* Top 3 Podium */}
+                        {top3.length >= 3 && (
+                            <div className="lb-podium">
+                                {podiumOrder.map(idx => {
+                                    const u = top3[idx];
+                                    if (!u) return null;
+                                    const isFirst = u.rank === 1;
+                                    return (
+                                        <div key={u.id} className="lb-podium-card" style={{ order: idx, transform: isFirst ? 'scale(1.08)' : 'none', borderColor: getRankColor(u.rank), borderWidth: isFirst ? 2 : 1 }}>
+                                            <div style={{ fontSize: isFirst ? '2rem' : '1.5rem', marginBottom: '0.5rem' }}>{getRankDisplay(u.rank)}</div>
+                                            <div className="lb-avatar" style={{ background: `linear-gradient(135deg, ${getRankColor(u.rank)}, ${getRankColor(u.rank)}88)`, width: isFirst ? 64 : 52, height: isFirst ? 64 : 52, fontSize: isFirst ? '1.3rem' : '1rem' }}>
+                                                {u.avatar}
+                                            </div>
+                                            <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.15rem', textAlign: 'center' }}>{u.name}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>{u.technology}</div>
+                                            <div style={{ fontWeight: 800, fontSize: '1.15rem', color: getRankColor(u.rank) }}>{u.total_score} pts</div>
+                                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{u.done_tasks} tasks done • avg {u.avg_score || 0}</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {/* Full Table */}
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', overflow: 'hidden' }}>
+                            <div className="lb-row lb-header">
+                                <div>Rank</div>
+                                <div>Intern</div>
+                                <div style={{ textAlign: 'center' }}>Score</div>
+                                <div style={{ textAlign: 'center' }}>Tasks</div>
+                                <div style={{ textAlign: 'center' }} className="hide-mobile">Avg</div>
+                            </div>
+                            {data.map(u => (
+                                <div key={u.id} className={`lb-row ${u.is_current_user ? 'current' : ''}`}>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{getRankDisplay(u.rank)}</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
+                                        <div className="lb-avatar-sm" style={{ background: u.rank <= 3 ? `linear-gradient(135deg, ${getRankColor(u.rank)}, ${getRankColor(u.rank)}88)` : 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+                                            {u.avatar}
+                                        </div>
+                                        <div style={{ overflow: 'hidden' }}>
+                                            <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {u.name}
+                                                {u.is_current_user && <span style={{ marginLeft: '0.4rem', background: 'var(--primary)', color: 'white', padding: '0.1rem 0.4rem', borderRadius: '999px', fontSize: '0.65rem', fontWeight: 700 }}>YOU</span>}
+                                            </div>
+                                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{u.technology}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'center', fontWeight: 700, color: 'var(--primary)', fontSize: '0.95rem' }}>{u.total_score}</div>
+                                    <div style={{ textAlign: 'center', fontSize: '0.85rem' }}>
+                                        <span style={{ fontWeight: 600 }}>{u.done_tasks}</span>
+                                        <span style={{ color: 'var(--text-muted)' }}>/{u.total_tasks}</span>
+                                    </div>
+                                    <div style={{ textAlign: 'center', fontSize: '0.85rem' }} className="hide-mobile">
+                                        {u.avg_score > 0 ? (
+                                            <span style={{ fontWeight: 600, color: u.avg_score >= 70 ? '#10B981' : u.avg_score >= 40 ? '#F59E0B' : '#EF4444' }}>{u.avg_score}</span>
+                                        ) : '—'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </DashboardLayout>
     );

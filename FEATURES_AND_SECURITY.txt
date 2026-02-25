@@ -1,0 +1,534 @@
+================================================================================
+     INTERNSHIP PERFORMANCE MANAGEMENT SYSTEM — FEATURES & SECURITY DOCUMENT
+================================================================================
+     Project Name  : InternAI — Internship Performance Management System
+     Tech Stack    : Laravel 11 (Backend) + React + Vite (Frontend)
+     Last Updated  : 25 February 2026
+================================================================================
+
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+
+  1. SYSTEM OVERVIEW
+  2. USER ROLES & PERMISSIONS
+  3. MODULE 1 — AUTHENTICATION & AUTHORIZATION
+  4. MODULE 2 — HR / ADMIN PANEL
+  5. MODULE 3 — TEAM LEAD PANEL
+  6. MODULE 4 — INTERN PANEL
+  7. MODULE 5 — PERSONAL CODE EDITOR (IDE)
+  8. MODULE 6 — TASK & ASSIGNMENT ENGINE
+  9. SECURITY FEATURES (FULL LIST)
+  10. DATABASE MODELS
+  11. API ROUTES SUMMARY
+  12. ENVIRONMENT CONFIGURATION
+
+
+================================================================================
+  1. SYSTEM OVERVIEW
+================================================================================
+
+  The Internship Performance Management System is a full-stack web application
+  designed to manage internship programs. It enables:
+
+    • HR to approve/reject intern registrations and assign them to team leads
+    • Team Leads to create coding tasks, assign them, and review submissions
+    • Interns to complete tasks in a built-in code editor with live execution
+    • All roles to track performance, scores, and progress
+
+  Architecture:
+    • Backend  : Laravel 11 (PHP 8.2+) with Sanctum token-based authentication
+    • Frontend : React 18 with Vite, React Router v6
+    • Database : MySQL (internship_db)
+    • Code Exec: Judge0 CE (free open-source, ce.judge0.com)
+    • Email    : SMTP (Gmail) for password reset emails
+
+
+================================================================================
+  2. USER ROLES & PERMISSIONS
+================================================================================
+
+  ┌─────────────┬─────────────────────────────────────────────────────────────┐
+  │ Role        │ Permissions                                                 │
+  ├─────────────┼─────────────────────────────────────────────────────────────┤
+  │ intern      │ View assigned tasks, use code editor, submit solutions,     │
+  │             │ view performance, leaderboard, profile, notifications       │
+  ├─────────────┼─────────────────────────────────────────────────────────────┤
+  │ teamlead    │ View assigned interns, create/edit/delete tasks, assign     │
+  │             │ tasks to single/all interns, review submissions, give       │
+  │             │ scores and feedback                                         │
+  ├─────────────┼─────────────────────────────────────────────────────────────┤
+  │ hr          │ Approve/reject registrations, assign interns to team leads, │
+  │             │ view all members, view dashboard stats, audit logs          │
+  ├─────────────┼─────────────────────────────────────────────────────────────┤
+  │ admin       │ All permissions of hr + teamlead combined                   │
+  └─────────────┴─────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+  3. MODULE 1 — AUTHENTICATION & AUTHORIZATION
+================================================================================
+
+  FEATURES:
+    • User Registration with role selection (intern / team lead)
+    • Login with email & password
+    • Forgot Password — sends a reset link to registered email via SMTP
+    • Reset Password — token-validated password change
+    • Logout — invalidates server-side Sanctum token + clears localStorage
+    • Auto-redirect — logged-in users are redirected away from auth pages
+
+  PAGES:
+    • /auth/login            → Login page
+    • /auth/register         → Registration page
+    • /auth/forgot-password  → Request password reset email
+    • /auth/reset-password   → Set new password using token
+
+  SECURITY FEATURES:
+    ✔ Sanctum Token-Based Authentication (stateless API tokens)
+    ✔ Password hashing with bcrypt (12 rounds)
+    ✔ Account status check — only 'approved' users can log in
+    ✔ Pending users get 403 with "account is pending approval" message
+    ✔ PublicRoute guard — prevents logged-in users from accessing auth pages
+    ✔ ProtectedRoute guard — prevents unauthenticated users from accessing
+      dashboard pages; redirects based on role if role mismatch
+    ✔ 401 auto-logout — if any API call returns 401, the frontend clears
+      tokens and redirects to login page immediately
+    ✔ Token stored in localStorage as 'auth_token'
+    ✔ User object stored in localStorage as 'user'
+
+  BACKEND CONTROLLERS:
+    • AuthController     → register, login, logout, user, myStats
+    • PasswordResetController → sendResetLinkEmail, reset
+
+
+================================================================================
+  4. MODULE 2 — HR / ADMIN PANEL
+================================================================================
+
+  FEATURES:
+    • HR Dashboard
+        - Total users, pending approvals, active interns, team leads count
+        - Quick stat cards with icons
+    • Pending Approvals
+        - View all registered users with 'pending' status
+        - Approve or reject each user with one click
+        - View user details (name, email, role, technology, registration date)
+    • Team Lead Assignment
+        - View all unassigned interns
+        - View all team leads and their current intern count
+        - Assign interns to team leads
+        - Unassign interns from team leads
+        - View which interns are under which lead
+        - Assignment stats (total assigned, unassigned, leads count)
+    • All Members
+        - View every user in the system
+        - Filter by role, status, technology
+        - Search by name/email
+    • Audit Log
+        - View all approval actions (who approved/rejected whom, when)
+        - Filterable and searchable
+
+  PAGES:
+    • /hr/dashboard    → HR Dashboard with stats
+    • /hr/approvals    → Pending Approvals management
+    • /hr/assignments  → Team Lead ↔ Intern assignment
+    • /hr/members      → All Members directory
+    • /hr/audit-log    → Approval audit trail
+
+  SECURITY FEATURES:
+    ✔ All HR routes protected by role:hr,admin middleware
+    ✔ Frontend ProtectedRoute restricts access to hr/admin roles only
+    ✔ ApprovalController has internal authorize() check for hr/admin role
+    ✔ Audit logging — every status change is recorded in approval_logs table
+
+
+================================================================================
+  5. MODULE 3 — TEAM LEAD PANEL
+================================================================================
+
+  FEATURES:
+    • Team Lead Dashboard
+        - View all assigned interns with their details
+        - See intern performance summaries
+    • Intern Management
+        - View intern cards with performance metrics
+        - Highlight underperforming interns (green border visual cue)
+        - Horizontal card layout for better readability
+    • Topics & Task Management
+        - Create new coding tasks with title, description, difficulty, due date
+        - Assign tasks to a SINGLE intern or ALL interns at once
+        - Edit existing tasks
+        - Delete tasks
+        - View task cards with status badges (To Do, In Progress, Done)
+        - Filter tasks by status
+        - Search tasks by title/description
+        - Task stats (total, to do, in progress, done)
+        - See "Awaiting your review" badge on submitted tasks
+        - See "Reviewed — Score: X/100" badge on reviewed tasks
+    • Code Reviews
+        - Review intern code submissions
+        - Provide feedback text and score (0-100)
+        - Mark task as done or keep in progress
+        - View submitted code directly
+
+  PAGES:
+    • /lead/dashboard  → Intern overview
+    • /lead/interns    → Intern management cards
+    • /lead/topics     → Task CRUD & assignment
+    • /lead/review     → Code review interface
+
+  SECURITY FEATURES:
+    ✔ All lead routes protected by role:teamlead,admin middleware (backend)
+    ✔ Frontend ProtectedRoute restricts access to teamlead/admin roles only
+    ✔ Task creation validates assigned_to intern exists
+    ✔ Task review validates creator_id matches the logged-in team lead
+    ✔ Team lead can only see tasks they created (filtered by creator_id)
+    ✔ my-interns endpoint accessible to authenticated team leads
+
+
+================================================================================
+  6. MODULE 4 — INTERN PANEL
+================================================================================
+
+  FEATURES:
+    • Intern Dashboard
+        - View personal stats (total tasks, completed, in progress, score)
+        - Quick access to workspace and performance
+    • My Tasks (Workspace)
+        - View all assigned tasks as styled cards
+        - Filter by status (all, to do, in progress, done)
+        - Search tasks
+        - Click to open task in the Code Editor
+        - See difficulty badge, due date, assigned by info
+    • Code Editor Page (IDE) — see Module 5 for details
+    • Performance
+        - View performance metrics and history
+        - Task completion rate, average scores
+    • Leaderboard
+        - Compare performance with other interns
+        - Ranked by scores
+    • Profile
+        - View and manage personal profile information
+    • Notifications
+        - View notifications and updates
+    • Session History
+        - View past login/activity sessions
+
+  PAGES:
+    • /intern/dashboard        → Personal dashboard
+    • /intern/workspace        → Task list
+    • /intern/editor/:taskId   → Code editor for a specific task
+    • /intern/performance      → Performance charts
+    • /intern/leaderboard      → Leaderboard ranking
+    • /intern/profile          → Profile page
+    • /intern/notifications    → Notifications page
+
+  SECURITY FEATURES:
+    ✔ All intern routes protected by role:intern middleware
+    ✔ Frontend ProtectedRoute restricts access to intern role only
+    ✔ Task submission validates assigned_to matches logged-in intern (403)
+    ✔ Draft auto-save validates task ownership before saving
+
+
+================================================================================
+  7. MODULE 5 — PERSONAL CODE EDITOR (IDE)
+================================================================================
+
+  FEATURES:
+    • Monaco Editor (VS Code engine) with syntax highlighting
+    • 11 Programming Languages Supported:
+        1.  JavaScript (Node.js 18.15.0)
+        2.  Python (3.11.2)
+        3.  PHP (7.4.1)
+        4.  Java (OpenJDK 13.0.1)
+        5.  C (GCC 9.2.0)
+        6.  C++ (GCC 9.2.0)
+        7.  TypeScript (5.0.3)
+        8.  Go (1.13.5)
+        9.  Bash (5.0.0)
+        10. Rust (1.40.0)
+        11. SQL (SQLite 3.27.2)
+    • Live Code Execution — code runs on Judge0 CE sandbox (free, open-source)
+    • Standard Input (stdin) — custom input panel for testing
+    • Theme Toggle — switch between dark and light editor themes
+    • Font Size Controls — adjustable A-/A+ buttons
+    • Word Wrap Toggle
+    • Auto-save — drafts saved every 30 seconds automatically
+    • Manual Save — Ctrl+S shortcut
+    • Run Code — Ctrl+Enter shortcut
+    • Submit Solution — sends code for team lead review
+    • Activity Logging — keystrokes, runs, saves, and paste attempts tracked
+    • Left sidebar shows:
+        - Problem title, description, difficulty, status
+        - Due date
+        - Assigned by (team lead name and avatar)
+        - Feedback & score (if reviewed)
+        - Keyboard shortcuts reference
+        - Security notice with paste attempt counter
+    • Bottom panels:
+        - Output panel (stdout + stderr separated)
+        - Stdin input panel
+        - Problem description panel
+    • Resizable bottom panel (chevron up/down to expand/collapse)
+    • Submit confirmation modal with code stats (language, lines, characters)
+
+  CODE EXECUTION ENGINE:
+    • Primary : Judge0 Community Edition (ce.judge0.com) — FREE, no API key
+    • Fallback: Judge0 via RapidAPI (if JUDGE0_API_KEY is set in .env)
+    • Timeout : 20 seconds per execution
+    • Polling  : If result is still processing, polls once after 2 seconds
+    • Sandbox  : code runs in isolated containers (Judge0 infrastructure)
+
+  SECURITY FEATURES — COPY-PASTE DETECTION:
+    ✔ Clipboard paste BLOCKED — Ctrl+V and right-click paste intercepted
+    ✔ Paste attempts LOGGED with:
+        - Timestamp of attempt
+        - Length of pasted text
+        - Preview of first 80 characters
+    ✔ Paste attempt counter displayed in sidebar (red warning badge)
+    ✔ Each paste attempt triggers an error toast: "Paste blocked! Attempt #N"
+    ✔ Drag-and-drop BLOCKED — files and text cannot be dropped into editor
+    ✔ Right-click context menu DISABLED inside Monaco editor area
+    ✔ Copy events are LOGGED (allowed but tracked for audit)
+    ✔ All activity (pastes, runs, saves, keystrokes) saved to task activity_log
+    ✔ Activity log viewable by team leads during code review
+    ✔ Event listeners use capture phase (true) for maximum interception
+
+
+================================================================================
+  8. MODULE 6 — TASK & ASSIGNMENT ENGINE
+================================================================================
+
+  TASK LIFECYCLE:
+    1. Team lead CREATEs task → status: 'todo'
+    2. Intern views task in workspace and opens in code editor
+    3. Intern writes code, runs it, saves drafts
+    4. Intern SUBMITs solution → status: 'in_progress'
+    5. Team lead REVIEWs submission → adds feedback, score → status: 'done'
+
+  TASK FIELDS:
+    • title          — Task name (required)
+    • description    — Detailed description (optional)
+    • difficulty     — basic / medium / hard
+    • assigned_to    — Intern user ID (or "all" for bulk assignment)
+    • creator_id     — Team lead who created it
+    • due_date       — Deadline
+    • status         — todo / in_progress / done
+    • submission     — Intern's submitted code
+    • feedback       — Team lead's feedback text
+    • score          — 0-100 numeric score
+    • submitted_at   — When intern submitted
+    • reviewed_at    — When team lead reviewed
+    • draft_code     — Auto-saved editor content
+    • draft_language — Language of the draft
+    • draft_saved_at — Last auto-save timestamp
+    • activity_log   — JSON array of all editor activity
+
+  ASSIGNMENT FEATURES:
+    • Assign to SINGLE intern — select from dropdown
+    • Assign to ALL interns — creates a separate task for each intern
+    • Re-assignment supported — edit task to change assigned_to
+    • HR assigns interns to team leads (team_lead_id on users table)
+
+  SECURITY FEATURES:
+    ✔ Only teamlead/admin can create, update, delete, review tasks
+    ✔ Only the assigned intern can submit a solution (403 otherwise)
+    ✔ Only the task creator can review it (403 otherwise)
+    ✔ Interns can only read tasks assigned to them
+    ✔ Team leads can only see tasks they created
+    ✔ HR/Admin can see all tasks
+
+
+================================================================================
+  9. SECURITY FEATURES — FULL LIST
+================================================================================
+
+  AUTHENTICATION:
+    ✔ Laravel Sanctum token-based API authentication
+    ✔ bcrypt password hashing (12 rounds)
+    ✔ Account approval flow — new users are 'pending' until HR approves
+    ✔ 403 returned for pending/rejected accounts on login
+    ✔ Logout invalidates server-side Sanctum token
+    ✔ Frontend clears localStorage on logout (auth_token + user)
+
+  ROUTE PROTECTION — BACKEND:
+    ✔ auth:sanctum middleware on all authenticated routes
+    ✔ Custom RoleMiddleware (role:intern, role:hr,admin, role:teamlead,admin)
+    ✔ 403 Forbidden response for unauthorized role access
+    ✔ HR routes gated with role:hr,admin
+    ✔ Task management routes gated with role:teamlead,admin
+    ✔ Legacy admin routes gated with role:hr,admin,teamlead
+
+  ROUTE PROTECTION — FRONTEND:
+    ✔ ProtectedRoute component — checks token + role in localStorage
+    ✔ Redirects unauthenticated users to /auth/login
+    ✔ Redirects wrong-role users to their correct dashboard
+    ✔ PublicRoute component — redirects logged-in users away from auth pages
+    ✔ 401 auto-logout on any API call (frontend-wide)
+
+  CODE EDITOR SECURITY:
+    ✔ Paste detection & blocking (Ctrl+V, right-click, clipboard API)
+    ✔ Paste attempts logged with timestamp, text length, preview
+    ✔ Paste counter displayed in real-time in the UI
+    ✔ Drag-and-drop disabled (dragover + drop events prevented)
+    ✔ Context menu disabled inside editor area
+    ✔ Copy events logged for audit trail
+    ✔ All activity saved to task activity_log (JSON)
+    ✔ Code execution sandboxed via Judge0 (isolated containers)
+    ✔ Code execution timeout: 20 seconds max
+    ✔ Maximum code size: 65,535 characters
+    ✔ Maximum stdin size: 4,096 characters
+
+  DATA PROTECTION:
+    ✔ Password field hidden in serialization (User model $hidden)
+    ✔ remember_token hidden in serialization
+    ✔ CORS configured for API access
+    ✔ Input validation on all API endpoints (Laravel FormRequest)
+    ✔ SQL injection prevention (Eloquent ORM parameterized queries)
+    ✔ XSS prevention (React's built-in JSX escaping)
+
+  AUDIT & LOGGING:
+    ✔ Approval audit logs (who approved/rejected whom, timestamp)
+    ✔ Task activity log (runs, saves, paste attempts, keystrokes)
+    ✔ Laravel Log facade for server-side error logging
+    ✔ Console logging for frontend debugging (development only)
+
+  SESSION MANAGEMENT:
+    ✔ Sanctum tokens — no session cookies for API
+    ✔ Session driver: database (configurable)
+    ✔ Session lifetime: 120 minutes
+    ✔ Logout clears both server token and client storage
+
+  EMAIL SECURITY:
+    ✔ Password reset via SMTP (Gmail TLS on port 587)
+    ✔ Reset tokens are time-limited
+    ✔ Reset tokens validated server-side before allowing password change
+
+
+================================================================================
+  10. DATABASE MODELS
+================================================================================
+
+  USERS TABLE:
+    • id, name, email, password (hashed)
+    • role_id (FK → roles), technology_id (FK → technologies)
+    • status (pending / approved / rejected)
+    • team_lead_id (FK → users, for interns)
+    • is_active (boolean), assigned_at (datetime)
+    • email_verified_at, remember_token, timestamps
+
+  ROLES TABLE:
+    • id, name (intern / teamlead / hr / admin)
+
+  TECHNOLOGIES TABLE:
+    • id, name (e.g., PHP, Python, JavaScript, etc.)
+
+  TASKS TABLE:
+    • id, title, description, status, difficulty
+    • assigned_to (FK → users), creator_id (FK → users)
+    • due_date, submission, feedback, score
+    • submitted_at, reviewed_at
+    • draft_code, draft_language, draft_saved_at
+    • activity_log (JSON), timestamps
+
+  APPROVAL_LOGS TABLE:
+    • id, user_id, action, performed_by, timestamps
+
+  RELATIONSHIPS:
+    • User belongsTo Role
+    • User belongsTo Technology
+    • User belongsTo User (teamLead via team_lead_id)
+    • User hasMany User (interns via team_lead_id)
+    • Task belongsTo User (assignee via assigned_to)
+    • Task belongsTo User (creator via creator_id)
+
+
+================================================================================
+  11. API ROUTES SUMMARY
+================================================================================
+
+  PUBLIC (NO AUTH):
+    POST   /api/register          → Register new user
+    POST   /api/login             → Login and get token
+    POST   /api/forgot-password   → Send password reset email
+    POST   /api/reset-password    → Reset password with token
+
+  AUTHENTICATED (ALL ROLES):
+    POST   /api/logout            → Logout and revoke token
+    GET    /api/user              → Get current user info
+    GET    /api/me/stats          → Get current user stats
+    POST   /api/code/run          → Execute code via Judge0
+    POST   /api/code/autosave     → Auto-save editor draft
+    GET    /api/tasks/stats       → Task statistics
+    POST   /api/tasks/{id}/submit → Submit task solution (intern)
+    GET    /api/tasks             → List tasks (role-filtered)
+    GET    /api/tasks/{id}        → Get single task
+    GET    /api/my-interns        → Get team lead's interns
+
+  TEAM LEAD / ADMIN ONLY:
+    POST   /api/tasks             → Create task
+    PUT    /api/tasks/{id}        → Update task
+    PATCH  /api/tasks/{id}        → Update task (partial)
+    DELETE /api/tasks/{id}        → Delete task
+    POST   /api/tasks/{id}/review → Review submitted task
+
+  HR / ADMIN ONLY:
+    GET    /api/hr/stats              → HR dashboard stats
+    GET    /api/hr/users              → List all users
+    GET    /api/hr/users/{id}         → Get single user
+    PUT    /api/hr/users/{id}/status  → Approve/reject user
+    GET    /api/hr/logs               → Audit logs
+    GET    /api/hr/assignments/stats  → Assignment stats
+    GET    /api/hr/assignments/interns→ List all interns
+    GET    /api/hr/assignments/leads  → List all team leads
+    POST   /api/hr/assignments/assign → Assign intern to lead
+    DELETE /api/hr/assignments/{id}   → Unassign intern
+    GET    /api/hr/assignments/leads/{id}/interns → Lead's interns
+    GET    /api/hr/assignments/my-interns → Current user's interns
+
+  LEGACY ADMIN (HR / ADMIN / TEAMLEAD):
+    GET    /api/admin/pending-users       → Get pending users
+    PUT    /api/admin/users/{id}/status   → Update user status
+
+
+================================================================================
+  12. ENVIRONMENT CONFIGURATION
+================================================================================
+
+  KEY .env VARIABLES:
+
+    # Application
+    APP_NAME=Laravel
+    APP_ENV=local
+    APP_KEY=base64:...
+    APP_DEBUG=true
+
+    # Database
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=internship_db
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    # Email (for password reset)
+    MAIL_MAILER=smtp
+    MAIL_HOST=smtp.gmail.com
+    MAIL_PORT=587
+    MAIL_USERNAME=your_email@gmail.com
+    MAIL_PASSWORD=your_app_password
+    MAIL_FROM_ADDRESS=your_email@gmail.com
+    MAIL_FROM_NAME="InternAI"
+
+    # Code Execution (optional — uses free public instance by default)
+    JUDGE0_API_KEY=your_rapidapi_key_here   (leave default for free tier)
+    JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
+
+  FRONTEND CONFIG (frontend/src/config.js):
+    API_BASE_URL = 'http://127.0.0.1:8000/api'
+
+
+================================================================================
+  END OF DOCUMENT
+================================================================================
