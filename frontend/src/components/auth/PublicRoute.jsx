@@ -12,7 +12,7 @@ const PublicRoute = ({ children }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const role = user?.role?.name;
 
-    if (token && role) {
+    if (token && role && user.status === 'approved') {
         if (role === 'teamlead' || role === 'admin') return <Navigate to="/lead/dashboard" replace />;
         if (role === 'hr') return <Navigate to="/hr/dashboard" replace />;
         return <Navigate to="/intern/dashboard" replace />;

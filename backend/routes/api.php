@@ -15,7 +15,7 @@ Route::post('/forgot-password', [App\Http\Controllers\PasswordResetController::c
 Route::post('/reset-password',  [App\Http\Controllers\PasswordResetController::class, 'reset']);
 
 // ── Authenticated routes ──────────────────────────────────────────────────────
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'approved'])->group(function () {
 
     // ── Auth utilities (all roles) ─────────────────────────────────────────
     Route::post('/logout',   [AuthController::class, 'logout']);

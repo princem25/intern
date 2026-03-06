@@ -50,12 +50,9 @@ class AuthController extends Controller
             \Log::warning('HR notification email failed: ' . $e->getMessage());
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'message' => 'Registration successful. Please wait for approval.',
             'user'    => $user,
-            'token'   => $token,
         ], 201);
     }
 

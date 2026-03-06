@@ -44,12 +44,6 @@ export const register = async (userData) => {
             throw new Error(data.message || 'Registration failed'); // Could contain validation errors
         }
 
-        // We might not log in immediately if pending approval
-        if (data.token) {
-            localStorage.setItem('auth_token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-        }
-
         return data;
     } catch (error) {
         throw error;

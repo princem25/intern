@@ -16,8 +16,12 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const role = user?.role?.name; // e.g. 'intern', 'teamlead', 'hr', 'admin'
 
-    // Not logged in → go to login
-    if (!token || !role) {
+    // Not logged in or not approved → go to login
+    if (!token || !role || user.status !== 'approved') {
+        if (token) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+        }
         return <Navigate to="/auth/login" replace />;
     }
 
