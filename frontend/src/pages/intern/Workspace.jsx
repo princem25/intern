@@ -49,7 +49,13 @@ const SubmitModal = ({ task, onClose, onSubmitted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const isAlreadySubmitted = task.status !== 'todo';
+
     const handleSubmit = async () => {
+        if (isAlreadySubmitted) {
+            setError('This task has already been submitted. You cannot resubmit until it is reviewed by your team lead.');
+            return;
+        }
         if (!code.trim()) { setError('Please enter your solution.'); return; }
         setLoading(true);
         try {
@@ -87,15 +93,27 @@ const SubmitModal = ({ task, onClose, onSubmitted }) => {
                     </div>
                 )}
 
+                {/* Warning if already submitted */}
+                {isAlreadySubmitted && (
+                    <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(245,158,11,0.1)', borderBottom: '1px solid rgba(245,158,11,0.2)', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                        <i className="fa-solid fa-triangle-exclamation" style={{ color: '#F59E0B', marginTop: '0.2rem', flexShrink: 0 }}></i>
+                        <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F59E0B' }}>Already Submitted</div>
+                            <div style={{ fontSize: '0.8rem', color: '#F59E0B', opacity: 0.9 }}>This task has been submitted and is awaiting review. You cannot resubmit until the team lead reviews it.</div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Code area */}
                 <div style={{ flex: 1, padding: '1rem 1.5rem', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <label style={{ fontWeight: 600, fontSize: '0.875rem' }}>Your Solution / Answer</label>
+                    <label style={{ fontWeight: 600, fontSize: '0.875rem' }}>Your Solution / Answer{isAlreadySubmitted && ' (Read-only)'}</label>
                     <textarea
                         value={code}
-                        onChange={e => setCode(e.target.value)}
+                        onChange={e => !isAlreadySubmitted && setCode(e.target.value)}
+                        disabled={isAlreadySubmitted}
                         placeholder="Paste your code or answer here..."
                         spellCheck={false}
-                        style={{ flex: 1, minHeight: '220px', padding: '1rem', background: '#1E1E1E', color: '#D4D4D4', border: '1px solid #333', borderRadius: '8px', fontFamily: "'Fira Code','Consolas',monospace", fontSize: '0.875rem', lineHeight: 1.6, resize: 'vertical', outline: 'none' }}
+                        style={{ flex: 1, minHeight: '220px', padding: '1rem', background: isAlreadySubmitted ? 'rgba(107,113,128,0.1)' : '#1E1E1E', color: isAlreadySubmitted ? 'rgba(107,113,128,0.6)' : '#D4D4D4', border: `1px solid ${isAlreadySubmitted ? 'rgba(107,113,128,0.2)' : '#333'}`, borderRadius: '8px', fontFamily: "'Fira Code','Consolas',monospace", fontSize: '0.875rem', lineHeight: 1.6, resize: 'vertical', outline: 'none', cursor: isAlreadySubmitted ? 'not-allowed' : 'text' }}
                     />
                     {error && <p style={{ color: '#EF4444', fontSize: '0.875rem' }}>{error}</p>}
                 </div>
@@ -114,10 +132,10 @@ const SubmitModal = ({ task, onClose, onSubmitted }) => {
                 {/* Footer buttons */}
                 <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                     <button onClick={onClose} style={{ padding: '0.625rem 1.25rem', background: 'var(--bg-body)', border: '1px solid var(--border)', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)' }}>
-                        Cancel
+                        {isAlreadySubmitted ? 'Close' : 'Cancel'}
                     </button>
-                    <button onClick={handleSubmit} disabled={loading} style={{ padding: '0.625rem 1.5rem', background: 'var(--gradient-primary)', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', color: 'white', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: loading ? 0.7 : 1 }}>
-                        {loading ? <><i className="fa-solid fa-spinner fa-spin"></i> Submitting…</> : <><i className="fa-solid fa-paper-plane"></i> Submit</>}
+                    <button onClick={handleSubmit} disabled={loading || isAlreadySubmitted} style={{ padding: '0.625rem 1.5rem', background: isAlreadySubmitted ? 'rgba(107,113,128,0.2)' : 'var(--gradient-primary)', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: isAlreadySubmitted || loading ? 'not-allowed' : 'pointer', color: isAlreadySubmitted ? 'rgba(107,113,128,0.6)' : 'white', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: (loading || isAlreadySubmitted) ? 0.7 : 1 }}>
+                        {loading ? <><i className="fa-solid fa-spinner fa-spin"></i> Submitting…</> : isAlreadySubmitted ? <><i className="fa-solid fa-ban"></i> Cannot Resubmit</> : <><i className="fa-solid fa-paper-plane"></i> Submit</>}
                     </button>
                 </div>
             </div>
@@ -260,9 +278,10 @@ const InternWorkspace = () => {
                                 <i className="fa-solid fa-code"></i> IDE
                             </Link>
                             {/* Quick submit */}
-                            <button onClick={e => { e.stopPropagation(); setSubmit(task); }}
-                                style={{ padding: '0.4rem 0.65rem', background: task.status === 'done' ? 'rgba(16,185,129,0.1)' : 'var(--gradient-primary)', border: 'none', borderRadius: '6px', color: task.status === 'done' ? '#10B981' : 'white', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                                {task.status === 'done' ? '✓ Done' : task.submission ? 'Resubmit' : 'Submit'}
+                            <button onClick={e => { e.stopPropagation(); if (task.status === 'todo') setSubmit(task); }}
+                                disabled={task.status !== 'todo'}
+                                style={{ padding: '0.4rem 0.65rem', background: task.status === 'todo' ? 'var(--gradient-primary)' : 'rgba(107,113,128,0.2)', border: 'none', borderRadius: '6px', color: task.status === 'todo' ? 'white' : 'rgba(107,113,128,0.6)', fontWeight: 600, fontSize: '0.75rem', cursor: task.status === 'todo' ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap', opacity: task.status === 'todo' ? 1 : 0.6 }}>
+                                {task.status === 'in_progress' ? '⏳ Submitted' : task.status === 'done' ? '✓ Done' : 'Submit'}
                             </button>
                         </div>
                     </div>
@@ -322,10 +341,11 @@ const InternWorkspace = () => {
                             <i className="fa-solid fa-code"></i> Open in Code Editor
                         </Link>
                         {/* Secondary: quick submit from textarea */}
-                        <button onClick={() => { setSubmit(selectedTask); setSelected(null); }}
-                            style={{ width: '100%', padding: '0.625rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-main)', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                        <button onClick={() => { if (selectedTask.status === 'todo') { setSubmit(selectedTask); setSelected(null); } }}
+                            disabled={selectedTask.status !== 'todo'}
+                            style={{ width: '100%', padding: '0.625rem', background: selectedTask.status === 'todo' ? 'transparent' : 'rgba(107,113,128,0.1)', border: `1px solid ${selectedTask.status === 'todo' ? 'var(--border)' : 'rgba(107,113,128,0.3)'}`, borderRadius: '8px', color: selectedTask.status === 'todo' ? 'var(--text-main)' : 'rgba(107,113,128,0.6)', fontWeight: 600, cursor: selectedTask.status === 'todo' ? 'pointer' : 'not-allowed', fontSize: '0.875rem', opacity: selectedTask.status === 'todo' ? 1 : 0.6 }}>
                             <i className="fa-solid fa-paper-plane" style={{ marginRight: '0.4rem' }}></i>
-                            {selectedTask.submission ? 'Quick Resubmit' : 'Quick Submit (text)'}
+                            {selectedTask.status === 'in_progress' ? '⏳ Awaiting Review' : selectedTask.status === 'done' ? '✓ Already Reviewed' : 'Quick Submit (text)'}
                         </button>
                     </div>
                 </div>

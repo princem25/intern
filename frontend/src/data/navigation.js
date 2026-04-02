@@ -18,6 +18,7 @@ export const hrLinks = [
     { text: 'Pending Approvals', icon: 'fa-user-clock', path: '/hr/approvals' },
     { text: 'Assign Team Lead', icon: 'fa-user-tie', path: '/hr/assignments' },
     { text: 'All Members', icon: 'fa-users', path: '/hr/members' },
+    { text: 'Performance', icon: 'fa-chart-line', path: '/hr/performance' },
     { text: 'Audit Log', icon: 'fa-clipboard-list', path: '/hr/audit-log' },
 ];
 

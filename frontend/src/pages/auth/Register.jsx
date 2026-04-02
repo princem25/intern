@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { register } from '../../api/auth';
@@ -9,6 +9,24 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [technologies, setTechnologies] = useState([]);
+
+    useEffect(() => {
+        // Fetch technologies from API
+        const fetchTechnologies = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/technologies`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setTechnologies(data);
+                }
+            } catch (err) {
+                console.error('Failed to fetch technologies:', err);
+            }
+        };
+
+        fetchTechnologies();
+    }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -100,18 +118,14 @@ const Register = () => {
                         </div>
                     </div>
 
-                    {/* Dynamic Fields */}
                     <div id="dynamic-fields" className="mb-4">
                         <div className="input-group">
                             <label className="input-label">Technology Track</label>
                             <select className="input-field" name="technology_id">
-                                <option value="1">React</option>
-                                <option value="2">Laravel</option>
-                                <option value="3">Python</option>
-                                <option value="4">Java</option>
-                                <option value="5">Testing</option>
-                                <option value="6">Vue</option>
-                                <option value="7">Node</option>
+                                <option value="">Select a technology</option>
+                                {technologies.map((tech) => (
+                                    <option key={tech.id} value={tech.id}>{tech.name}</option>
+                                ))}
                             </select>
                         </div>
                     </div>

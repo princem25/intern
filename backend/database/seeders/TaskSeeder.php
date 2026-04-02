@@ -9,6 +9,6 @@ class TaskSeeder extends Seeder
 {
     public function run(): void
     {
-        Task::factory()->count(10)->create();
+        // No fake tasks - removed as per requirements
     }
 }

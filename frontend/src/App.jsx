@@ -31,6 +31,7 @@ import HRDashboard from './pages/hr/Dashboard';
 import PendingApprovals from './pages/hr/PendingApprovals';
 import TeamLeadAssignment from './pages/hr/TeamLeadAssignment';
 import AllMembers from './pages/hr/AllMembers';
+import HRPerformance from './pages/hr/Performance';
 import AuditLog from './pages/hr/AuditLog';
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
             <Route path="approvals" element={<ProtectedRoute allowedRoles={['hr', 'admin']}><PendingApprovals /></ProtectedRoute>} />
             <Route path="assignments" element={<ProtectedRoute allowedRoles={['hr', 'admin']}><TeamLeadAssignment /></ProtectedRoute>} />
             <Route path="members" element={<ProtectedRoute allowedRoles={['hr', 'admin']}><AllMembers /></ProtectedRoute>} />
+            <Route path="performance" element={<ProtectedRoute allowedRoles={['hr', 'admin']}><HRPerformance /></ProtectedRoute>} />
             <Route path="audit-log" element={<ProtectedRoute allowedRoles={['hr', 'admin']}><AuditLog /></ProtectedRoute>} />
           </Route>
 

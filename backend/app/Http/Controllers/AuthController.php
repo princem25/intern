@@ -246,6 +246,12 @@ class AuthController extends Controller
             $avgScore     = (clone $tasks)->whereNotNull('score')->avg('score');
             $reviewedCount= (clone $tasks)->whereNotNull('score')->count();
 
+            // Get copy-paste incidents (10 attempts = 1 incident)
+            $copyPasteAttempts = \DB::table('copy_paste_logs')
+                ->where('intern_id', $intern->id)
+                ->sum('paste_count');
+            $copyIncidents = intval($copyPasteAttempts / 10);
+
             return [
                 'id'              => $intern->id,
                 'name'            => $intern->name,
@@ -257,6 +263,8 @@ class AuthController extends Controller
                 'total_score'     => (int) $totalScore,
                 'avg_score'       => $avgScore ? round($avgScore, 1) : 0,
                 'reviewed_tasks'  => $reviewedCount,
+                'copy_paste_attempts' => $copyPasteAttempts,
+                'copy_incidents'  => $copyIncidents,
                 'is_current_user' => $currentUser->id === $intern->id,
                 'joined'          => $intern->created_at,
             ];

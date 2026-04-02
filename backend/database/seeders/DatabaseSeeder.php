@@ -17,36 +17,22 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Seed Roles
-        $roles = ['intern', 'teamlead', 'admin', 'hr'];
+        $roles = ['intern', 'teamlead', 'hr'];
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
         }
         
         // Seed Technologies
-        $technologies = ['React', 'Laravel', 'Python', 'Java', 'Testing', 'Vue', 'Node'];
+        $technologies = ['Java', 'Laravel', 'Node', 'Python', 'React', 'Testing', 'Vue'];
         foreach ($technologies as $tech) {
             Technology::firstOrCreate(['name' => $tech]);
-        }
-
-        // Create Admin User
-        $adminRole = Role::where('name', 'admin')->first();
-        if ($adminRole) {
-            User::firstOrCreate(
-                ['email' => 'admin@example.com'],
-                [
-                    'name' => 'Admin User',
-                    'password' => Hash::make('password'),
-                    'role_id' => $adminRole->id,
-                    'status' => 'approved',
-                ]
-            );
         }
 
         // Create Team Lead User
         $leadRole = Role::where('name', 'teamlead')->first();
         if ($leadRole) {
             User::firstOrCreate(
-                ['email' => 'lead@example.com'],
+                ['email' => 'teamlead@example.com'],
                 [
                     'name' => 'Team Lead',
                     'password' => Hash::make('password'),
@@ -70,7 +56,18 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // Seed some tasks
-        $this->call(TaskSeeder::class);
+        // Create Intern User
+        $internRole = Role::where('name', 'intern')->first();
+        if ($internRole) {
+            User::firstOrCreate(
+                ['email' => 'intern@example.com'],
+                [
+                    'name' => 'Intern',
+                    'password' => Hash::make('password'),
+                    'role_id' => $internRole->id,
+                    'status' => 'approved',
+                ]
+            );
+        }
     }
 }

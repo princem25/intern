@@ -124,7 +124,27 @@ const CodeEditorPage = () => {
                 preview: pastedText.substring(0, 80) + (pastedText.length > 80 ? '…' : ''),
             };
             pasteAttempts.current.push(attempt);
-            setPasteCount(c => c + 1);
+            setPasteCount(c => {
+                const newCount = c + 1;
+                
+                // Alert HR and Team Lead if paste count reaches 10
+                if (newCount === 10) {
+                    const token = localStorage.getItem('auth_token');
+                    fetch(`${config.API_BASE_URL}/report-copy-paste`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            task_id: taskId,
+                            paste_count: newCount,
+                        }),
+                    }).catch(err => console.error('Failed to report copy-paste:', err));
+                }
+                
+                return newCount;
+            });
             log('paste_attempt', { textLength: pastedText.length });
             showToast(`⚠ Paste blocked! Attempt #${pasteAttempts.current.length} recorded.`, 'error');
         };

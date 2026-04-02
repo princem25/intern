@@ -148,6 +148,7 @@ class TaskController extends Controller
     /**
      * POST /api/tasks/{id}/submit
      * Intern submits their answer/code for a task.
+     * Once submitted, cannot resubmit until reviewed.
      */
     public function submit(Request $request, Task $task)
     {
@@ -155,6 +156,13 @@ class TaskController extends Controller
 
         if ($task->assigned_to !== $user->id) {
             return response()->json(['message' => 'Not your task.'], 403);
+        }
+
+        // Prevent resubmission after initial submission
+        if ($task->status !== 'todo') {
+            return response()->json([
+                'message' => 'This task has already been submitted. You cannot resubmit until it is reviewed.',
+            ], 422);
         }
 
         $request->validate([

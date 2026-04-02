@@ -7,12 +7,15 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\CodeController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\CopyPasteController;
 
 // ── Public (unauthenticated) routes ──────────────────────────────────────────
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/forgot-password', [App\Http\Controllers\PasswordResetController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password',  [App\Http\Controllers\PasswordResetController::class, 'reset']);
+Route::get('/technologies', [\App\Http\Controllers\TechnologyController::class, 'index']);
 
 // ── Authenticated routes ──────────────────────────────────────────────────────
 Route::middleware(['auth:sanctum', 'approved'])->group(function () {
@@ -31,6 +34,9 @@ Route::middleware(['auth:sanctum', 'approved'])->group(function () {
     // Note: placed BEFORE apiResource routes to avoid wildcard conflicts
     Route::post('/code/run',      [CodeController::class, 'run']);
     Route::post('/code/autosave', [CodeController::class, 'autosave']);
+
+    // ── Copy-paste detection (interns) ─────────────────────────────────────
+    Route::post('/report-copy-paste', [CopyPasteController::class, 'reportCopyPaste']);
 
     // ── Task routes ───────────────────────────────────────────────────────
     // These specific action routes must be declared BEFORE apiResource
@@ -61,6 +67,8 @@ Route::middleware(['auth:sanctum', 'approved'])->group(function () {
         Route::get('/users/{id}',        [ApprovalController::class, 'show']);
         Route::put('/users/{id}/status', [ApprovalController::class, 'updateStatus']);
         Route::get('/logs',              [ApprovalController::class, 'logs']);
+        Route::get('/performance',       [PerformanceController::class, 'index']);
+        Route::get('/performance/{internId}', [PerformanceController::class, 'show']);
 
         Route::prefix('assignments')->group(function () {
             Route::get('/stats',                  [AssignmentController::class, 'stats']);
