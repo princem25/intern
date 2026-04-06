@@ -187,7 +187,7 @@
 
             <!-- Header -->
             <div class="header">
-                <div class="logo">InternAI</div>
+                <div class="logo">InternPro</div>
                 <div class="subtitle">Internship Performance Management System</div>
             </div>
 
@@ -199,7 +199,7 @@
             <!-- Body -->
             <div class="body">
                 <p>
-                    A new user has registered on the InternAI platform and is awaiting your review.
+                    A new user has registered on the InternPro platform and is awaiting your review.
                     Please log in to the HR portal to approve or reject their account.
                 </p>
 
@@ -248,14 +248,14 @@
                 </div>
 
                 <p style="font-size:0.8375rem; color:#94a3b8; text-align:center; margin-bottom:0;">
-                    This is an automated notification from InternAI. Do not reply to this email.
+                    This is an automated notification from InternPro. Do not reply to this email.
                 </p>
             </div>
 
             <!-- Footer -->
             <div class="footer">
                 <p>
-                    © {{ date('Y') }} InternAI &nbsp;·&nbsp; Internship Performance Management<br>
+                    © {{ date('Y') }} InternPro &nbsp;·&nbsp; Internship Performance Management<br>
                     You're receiving this because you're an HR manager on this platform.
                 </p>
             </div>

@@ -45,13 +45,7 @@ const Landing = () => {
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="card p-6 text-center">
-                            <div style={{ fontSize: '2.5rem', color: 'var(--success)', marginBottom: '1.5rem' }}>
-                                <i className="fa-solid fa-robot"></i>
-                            </div>
-                            <h3>AI-Driven Insights</h3>
-                            <p className="text-muted">Smart suggestions for learning paths and automated initial code assessments.</p>
-                        </div>
+                         
                     </div>
                 </div>
             </section>

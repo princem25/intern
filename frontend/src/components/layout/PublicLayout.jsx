@@ -10,7 +10,7 @@ export const PublicLayout = ({ children }) => {
             {/* Navbar */}
             <nav className="navbar">
                 <div className="container nav-container">
-                    <Link to="/" className="logo">InternAI</Link>
+                    <Link to="/" className="logo">InternPro</Link>
                     <div className="nav-links">
                         {/* Links... */}
                         <a href="#features" className="nav-link">Features</a>
@@ -37,13 +37,13 @@ export const PublicLayout = ({ children }) => {
             {/* Footer */}
             <footer style={{ background: 'var(--bg-card)', padding: '3rem 0', borderTop: '1px solid var(--border)' }}>
                 <div className="container text-center">
-                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>InternAI</h3>
+                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>InternPro</h3>
                     <div className="flex justify-center gap-6 mb-8 text-muted">
                         <a href="#">Privacy Policy</a>
                         <a href="#">Terms of Service</a>
                         <a href="#">Contact Support</a>
                     </div>
-                    <p className="text-muted" style={{ fontSize: '0.875rem' }}>&copy; 2026 InternAI Systems. All rights reserved.</p>
+                    <p className="text-muted" style={{ fontSize: '0.875rem' }}>&copy; 2026 InternPro Systems. All rights reserved.</p>
                 </div>
             </footer>
         </>

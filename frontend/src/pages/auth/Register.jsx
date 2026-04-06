@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { register } from '../../api/auth';
+import config from '../../config';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Register = () => {
         // Fetch technologies from API
         const fetchTechnologies = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/technologies`);
+                const response = await fetch(`${config.API_BASE_URL}/technologies`);
                 if (response.ok) {
                     const data = await response.json();
                     setTechnologies(data);
@@ -71,7 +72,7 @@ const Register = () => {
         <div className="flex min-h-screen items-center justify-center bg-body" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-body)' }}>
             <div className="card p-8 shadow-lg" style={{ width: '100%', maxWidth: '500px' }}>
                 <div className="text-center" style={{ marginBottom: '2rem' }}>
-                    <Link to="/" className="logo" style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'block' }}>InternAI</Link>
+                    <Link to="/" className="logo" style={{ fontSize: '2rem', marginBottom: '0.5rem', display: 'block' }}>InternPro</Link>
                     <p className="text-muted">Create your account</p>
                     {error && <div className="alert alert-danger mt-3" style={{ color: 'red', marginTop: '1rem' }}>{error}</div>}
                     {success && <div className="alert alert-success mt-3" style={{ color: 'green', marginTop: '1rem' }}>Registration successful! Redirecting...</div>}

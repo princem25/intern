@@ -48,7 +48,7 @@ const Login = () => {
         <div className="flex min-h-screen items-center justify-center bg-body" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-body)' }}>
             <div className="card p-8 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
                 <div className="text-center mb-8">
-                    <Link to="/" className="text-primary" style={{ fontSize: '2rem', fontWeight: 800 }}>InternAI</Link>
+                    <Link to="/" className="text-primary" style={{ fontSize: '2rem', fontWeight: 800 }}>InternPro</Link>
                     <h2 className="mt-4">Welcome Back</h2>
                     <p className="text-muted">Sign in to your account</p>
                     {error && <div className="alert alert-danger mt-3" style={{ color: 'red', marginTop: '1rem' }}>{error}</div>}

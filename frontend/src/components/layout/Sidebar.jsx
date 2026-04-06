@@ -18,7 +18,7 @@ export const Sidebar = ({ links, role = 'Intern', onToggle }) => {
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <i className="fa-solid fa-layer-group text-primary"
                         style={{ fontSize: '1.5rem', marginRight: '0.75rem' }}></i>
-                    <span style={{ fontSize: '1.25rem', fontWeight: 700 }}>InternAI</span>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 700 }}>InternPro</span>
                 </div>
                 {/* Toggle button inside sidebar */}
                 <button
